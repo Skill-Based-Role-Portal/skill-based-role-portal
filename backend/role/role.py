@@ -100,7 +100,7 @@ with app.app_context():
         
 
 
-db.session.add_all([new_role_1, new_role_2, new_role_3])
+        db.session.add_all([new_role_1, new_role_2, new_role_3])
         db.session.commit()
 
 
@@ -140,6 +140,40 @@ def find_by_role_id(role_id):
             "message": "Role not found."
         }
     ), 404
+
+@app.route("/role", methods=['POST'])
+def create_role():
+    data = request.get_json()
+    role = Role(**data)
+
+    if (Role.query.filter_by(name=role.name).first()):
+        return jsonify(
+            {
+                "code": 400,
+                "data": {
+                    "name": role.name
+                },
+                "message": "Role already exists."
+            }
+        ), 400
+
+    try:
+        db.session.add(role)
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred creating the role."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "code": 201,
+            "data": role.json()
+        }
+    ), 201
 
 if name == '__main__':
     app.run(host='0.0.0.0', port=5003, debug=True)
