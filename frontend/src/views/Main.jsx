@@ -1,3 +1,7 @@
+import {useState, useEffect} from "react";
+
+import RoleListing from '../components/RoleListing';
+
 import { Box, Grid, GridItem, Flex, VStack } from "@chakra-ui/react";
 
 export default function Main() {
@@ -13,9 +17,18 @@ export default function Main() {
           maxHeight={calculatedMaxHeight}
         >
           <GridItem colSpan={{ base: 4 }} h={"full"} overflowY={"scroll"}>
-            <VStack spacing={2.5} h={"full"}></VStack>
+            <VStack spacing={2.5} h={"full"}>
+              <RoleListing/>
+              <RoleListing/>
+              <RoleListing/>
+              <RoleListing/>
+              <RoleListing/>
+              <RoleListing/>
+            </VStack>
           </GridItem>
-          <GridItem colSpan={{ base: 8 }}></GridItem>
+          <GridItem colSpan={{ base: 8 }}>
+            Listing
+          </GridItem>
         </Grid>
       </Flex>
     </Flex>
