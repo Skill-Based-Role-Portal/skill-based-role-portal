@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from '@chakra-ui/react';
 
 export default function NavbarGroup(props) {
   const { groupName, children } = props;
@@ -6,10 +6,10 @@ export default function NavbarGroup(props) {
   return (
     <Box>
       <Text
-        fontSize={"sm"}
-        fontWeight={"medium"}
-        color={"gray.400"}
-        _dark={{ color: "gray.400" }}
+        fontSize={'sm'}
+        fontWeight={'medium'}
+        color={'gray.400'}
+        _dark={{ color: 'gray.400' }}
       >
         {groupName}
       </Text>
