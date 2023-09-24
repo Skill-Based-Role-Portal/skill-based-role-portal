@@ -7,9 +7,8 @@ import RoleService from '../services/role.service';
 import RoleListing from '../components/RoleListing';
 import PreviewRoleListing from '../components/PreviewRoleListing';
 
+import RoleListingSkeleton from '../components/skeletons/RoleListingSkeleton';
 import PreviewRoleListingSkeleton from '../components/skeletons/PreviewRoleListingSkeleton';
-
-import { Box, Grid, GridItem, Flex, VStack } from "@chakra-ui/react";
 
 export default function Main() {
   const calculatedMaxHeight = `calc(100vh - 80px - 4rem)`;
@@ -88,14 +87,32 @@ export default function Main() {
           h={"full"}
           maxHeight={calculatedMaxHeight}
         >
-          <GridItem colSpan={{ base: 4 }} h={"full"} overflowY={"scroll"}>
-            <VStack spacing={2.5} h={"full"}>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
+ <GridItem colSpan={{ base: 4 }} h={'full'} overflowY={'scroll'}>
+            <VStack
+              spacing={2.5}
+              h={'full'}
+              justifyContent={'start'}
+              alignItems={'start'}
+            >
+              {isLoading ? (
+                skeletons
+              ) : isError ? (
+                <Tag colorScheme={'red'} py={2} px={3}>
+                  Something went wrong...
+                </Tag>
+              ) : roles.length === 0 ? (
+                <Tag colorScheme={'facebook'} py={2} px={3}>
+                  No Roles found...
+                </Tag>
+              ) : (
+                roles.map(role => (
+                  <RoleListing
+                    key={role.role_id}
+                    role={role}
+                    clickedId={handleRoleClick}
+                  />
+                ))
+              )}
             </VStack>
           </GridItem>
           <GridItem colSpan={{ base: 8 }}>

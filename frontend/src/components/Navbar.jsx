@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ColorModeSwitcher } from '../ColorModeSwitcher';
+import { ColorModeSwitcher } from './ColorModeSwitcher';
 
 import {
   Flex,
