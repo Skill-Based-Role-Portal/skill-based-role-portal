@@ -1,20 +1,17 @@
-import { useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./App.css";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import MainLayout from "./layout/MainLayout";
-
-import Main from "./views/Main";
+import MainLayout from './layout/MainLayout';
+import Main from './views/Main';
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: '/',
       element: <MainLayout />,
       children: [
         {
-          path: "",
-          element: <Main />,
+          path: '',
+          element: <Main name={'Home'} />,
         },
       ],
     },
