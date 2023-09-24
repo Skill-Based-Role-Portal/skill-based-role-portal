@@ -144,7 +144,6 @@ services:
     environment:
       - PMA_ARBITRARY=1
 
-
   #################################
   # Role: The Role microservice
   #################################
