@@ -97,7 +97,7 @@ services:
   # Frontend
   #################################
   frontend:
-    image: mock-spm/frontend:1.0
+    image: sbrp/frontend:1.0
     build:
       context: .
       dockerfile: frontend/Dockerfile
@@ -107,7 +107,7 @@ services:
       - internal
     restart: always
     ports:
-      - "3000:3000"
+      - "5173:5173"
 
   #################################
   # Database: MySQL
@@ -144,12 +144,11 @@ services:
     environment:
       - PMA_ARBITRARY=1
 
-
   #################################
   # Role: The Role microservice
   #################################
   role:
-    image: mock-spm/role:1.0
+    image: sbrp/role:1.0
     build:
       context: .
       dockerfile: backend/role/Dockerfile

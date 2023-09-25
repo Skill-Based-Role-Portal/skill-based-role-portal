@@ -124,6 +124,28 @@ def get_all():
     ), 404
 
 
+@app.route("/role/active")
+def get_all_active():
+    today = datetime.today()
+
+    rolelist = Role.query.filter(Role.deadline > today).all()
+    if len(rolelist):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "roles": [role.json() for role in rolelist]
+                }
+            }
+        ), 200
+    return jsonify(
+        {
+            "code": 404,
+            "message": "There are no active roles."
+        }
+    ), 404
+
+
 @app.route("/role/<role_id>")
 def find_by_role_id(role_id):
     role = Role.query.filter_by(role_id=role_id).first()

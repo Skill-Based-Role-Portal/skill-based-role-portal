@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-import { Grid, GridItem, Flex, VStack, Tag } from '@chakra-ui/react';
+import { Grid, GridItem, Flex, VStack, Tag } from "@chakra-ui/react";
 
-import RoleService from '../services/role.service';
+import RoleService from "../services/role.service";
 
-import RoleListing from '../components/RoleListing';
-import PreviewRoleListing from '../components/PreviewRoleListing';
+import RoleListing from "../components/RoleListing";
+import PreviewRoleListing from "../components/PreviewRoleListing";
 
-import PreviewRoleListingSkeleton from '../components/skeletons/PreviewRoleListingSkeleton';
-
-import { Box, Grid, GridItem, Flex, VStack } from "@chakra-ui/react";
+import RoleListingSkeleton from "../components/skeletons/RoleListingSkeleton";
+import PreviewRoleListingSkeleton from "../components/skeletons/PreviewRoleListingSkeleton";
 
 export default function Main() {
   const calculatedMaxHeight = `calc(100vh - 80px - 4rem)`;
@@ -23,20 +22,21 @@ export default function Main() {
   const [previewRole, setPreviewRole] = useState({});
 
   useEffect(() => {
-    fetchRoles();
-    fetchRoleById(1);
+    fetchActiveRoles();
   }, []);
 
-  const fetchRoles = () => {
-    RoleService.getRoles().then(
-      response => {
-        setRoles(response.data.data.roles);
+  const fetchActiveRoles = () => {
+    RoleService.getActiveRoles().then(
+      (response) => {
+        const rolesData = response.data.data.roles;
+        setRoles(rolesData);
+        fetchRoleById(rolesData[0]?.role_id);
         setTimeout(() => {
           setIsLoading(false);
           setIsPreviewLoading(false);
         }, 500);
       },
-      error => {
+      (error) => {
         setTimeout(() => {
           setIsLoading(false);
           setIsPreviewLoading(false);
@@ -47,16 +47,16 @@ export default function Main() {
     );
   };
 
-  const fetchRoleById = roleId => {
+  const fetchRoleById = (roleId) => {
     RoleService.getRoleById(roleId).then(
-      response => {
+      (response) => {
         setPreviewRole(response.data.data);
         setTimeout(() => {
           setIsLoading(false);
           setIsPreviewLoading(false);
         }, 500);
       },
-      error => {
+      (error) => {
         setTimeout(() => {
           setIsLoading(false);
           setIsPreviewLoading(false);
@@ -71,7 +71,7 @@ export default function Main() {
     skeletons.push(<RoleListingSkeleton key={i} />);
   }
 
-  const handleRoleClick = roleId => {
+  const handleRoleClick = (roleId) => {
     setIsPreviewLoading(true);
     fetchRoleById(roleId);
     setTimeout(() => {
@@ -89,13 +89,31 @@ export default function Main() {
           maxHeight={calculatedMaxHeight}
         >
           <GridItem colSpan={{ base: 4 }} h={"full"} overflowY={"scroll"}>
-            <VStack spacing={2.5} h={"full"}>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
-              <RoleListing/>
+            <VStack
+              spacing={2.5}
+              h={"full"}
+              justifyContent={"start"}
+              alignItems={"start"}
+            >
+              {isLoading ? (
+                skeletons
+              ) : isError ? (
+                <Tag colorScheme={"red"} py={2} px={3}>
+                  Something went wrong...
+                </Tag>
+              ) : roles.length === 0 ? (
+                <Tag colorScheme={"facebook"} py={2} px={3}>
+                  No Roles found...
+                </Tag>
+              ) : (
+                roles.map((role) => (
+                  <RoleListing
+                    key={role.role_id}
+                    role={role}
+                    clickedId={handleRoleClick}
+                  />
+                ))
+              )}
             </VStack>
           </GridItem>
           <GridItem colSpan={{ base: 8 }}>
