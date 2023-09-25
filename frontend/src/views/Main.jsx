@@ -22,20 +22,15 @@ export default function Main() {
   const [previewRole, setPreviewRole] = useState({});
 
   useEffect(() => {
-    fetchRoles();
-    fetchRoleById(1);
+    fetchActiveRoles();
   }, []);
 
-  const fetchRoles = () => {
-    RoleService.getRoles().then(
+  const fetchActiveRoles = () => {
+    RoleService.getActiveRoles().then(
       (response) => {
-        const filteredRoles = response.data.data.roles.filter((role) => {
-          const deadlineDate = new Date(role.deadline);
-          const today = new Date();
-          return deadlineDate > today;
-        });
-
-        setRoles(filteredRoles);
+        const rolesData = response.data.data.roles;
+        setRoles(rolesData);
+        fetchRoleById(rolesData[0]?.role_id);
         setTimeout(() => {
           setIsLoading(false);
           setIsPreviewLoading(false);
