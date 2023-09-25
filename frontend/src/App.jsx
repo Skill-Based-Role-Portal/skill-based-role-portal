@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import MainLayout from './layout/MainLayout';
 import Main from './views/Main';
+import CreateRoleListingPage from './views/CreateRoleListing';
 
 function App() {
   const router = createBrowserRouter([
@@ -12,6 +13,10 @@ function App() {
         {
           path: '',
           element: <Main name={'Home'} />,
+        },
+        {
+          path: 'create-role-listing',
+          element: <CreateRoleListingPage name={'Role Creation'} />,
         },
       ],
     },
