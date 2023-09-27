@@ -126,9 +126,9 @@ def get_all():
 
 @app.route("/role/active")
 def get_all_active():
-    today = datetime.today()
+    today = datetime.today().date()
 
-    rolelist = Role.query.filter(Role.deadline > today).all()
+    rolelist = Role.query.filter(Role.deadline >= today).all()
     if len(rolelist):
         return jsonify(
             {
