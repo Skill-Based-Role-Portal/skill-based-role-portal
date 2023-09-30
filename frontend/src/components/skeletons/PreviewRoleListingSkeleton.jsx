@@ -1,3 +1,4 @@
+// Chakra imports
 import {
   Box,
   Flex,
@@ -7,90 +8,90 @@ import {
   HStack,
   Skeleton,
   SkeletonText,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
 export default function PreviewRoleListing() {
   return (
-    <Flex h={'full'}>
+    <Flex h={"full"}>
       <Card
         p={0.5}
-        w={'full'}
-        variant={'outline'}
-        backgroundColor={'gray.50'}
-        _dark={{ backgroundColor: 'gray.800' }}
+        w={"full"}
+        variant={"outline"}
+        backgroundColor={"gray.50"}
+        _dark={{ backgroundColor: "gray.800" }}
       >
         <CardBody
-          color={'gray.700'}
-          _dark={{ color: 'gray.400' }}
-          display={'flex'}
-          flexDirection={'column'}
-          justifyContent={'space-between'}
+          color={"gray.700"}
+          _dark={{ color: "gray.400" }}
+          display={"flex"}
+          flexDirection={"column"}
+          justifyContent={"space-between"}
         >
-          <Flex flexDirection={'column'}>
-            <Flex justifyContent={'space-between'} mb={4}>
+          <Flex flexDirection={"column"}>
+            <Flex justifyContent={"space-between"} mb={4}>
               <Box>
-                <Skeleton h={'22px'} w={'180px'} mb={2} />
-                <Skeleton h={'28px'} w={'250px'} mb={2.5} />
-                <Skeleton h={'20px'} w={'120px'} />
+                <Skeleton h={"22px"} w={"180px"} mb={2} />
+                <Skeleton h={"28px"} w={"250px"} mb={2.5} />
+                <Skeleton h={"20px"} w={"120px"} />
               </Box>
               <Flex>
-                <Skeleton h={'40px'} w={'70px'} mr={2.5} />
-                <Skeleton h={'40px'} w={'40px'} mr={2.5} />
-                <Skeleton h={'40px'} w={'40px'} />
+                <Skeleton h={"40px"} w={"70px"} mr={2.5} />
+                <Skeleton h={"40px"} w={"40px"} mr={2.5} />
+                <Skeleton h={"40px"} w={"40px"} />
               </Flex>
             </Flex>
             <Flex
               mb={10}
-              justifyContent={'space-between'}
-              alignItems={'center'}
+              justifyContent={"space-between"}
+              alignItems={"center"}
             >
               <Flex>
-                <Skeleton h={'24px'} w={'100px'} mr={2} />
-                <Skeleton h={'24px'} w={'100px'} />
+                <Skeleton h={"24px"} w={"100px"} mr={2} />
+                <Skeleton h={"24px"} w={"100px"} />
               </Flex>
               <Flex>
-                <Skeleton h={'20px'} w={'175px'} />
+                <Skeleton h={"20px"} w={"175px"} />
               </Flex>
             </Flex>
-            <VStack spacing={5} alignItems={'start'}>
+            <VStack spacing={5} alignItems={"start"}>
               <Flex flexDirection="column" w="full">
-                <Skeleton h={'18px'} w={'150px'} mb={2} />
+                <Skeleton h={"18px"} w={"150px"} mb={2} />
                 <SkeletonText
                   noOfLines={3}
                   spacing="2"
                   skeletonHeight="4"
-                  w={'full'}
+                  w={"full"}
                 />
               </Flex>
               <Flex flexDirection="column" w="full">
-                <Skeleton h={'18px'} w={'150px'} mb={2} />
+                <Skeleton h={"18px"} w={"150px"} mb={2} />
                 <SkeletonText
                   noOfLines={3}
                   spacing="2"
                   skeletonHeight="4"
-                  w={'full'}
+                  w={"full"}
                 />
               </Flex>
               <Flex flexDirection="column">
-                <Skeleton h={'18px'} w={'45px'} mb={2} />
+                <Skeleton h={"18px"} w={"45px"} mb={2} />
                 <HStack spacing={2.5}>
-                  <Skeleton h={'20px'} w={'60px'} />
-                  <Skeleton h={'20px'} w={'60px'} />
-                  <Skeleton h={'20px'} w={'60px'} />
+                  <Skeleton h={"20px"} w={"60px"} />
+                  <Skeleton h={"20px"} w={"60px"} />
+                  <Skeleton h={"20px"} w={"60px"} />
                 </HStack>
               </Flex>
             </VStack>
           </Flex>
           <Flex
-            flexDirection={'column'}
-            justifyContent={'center'}
-            alignItems={'end'}
+            flexDirection={"column"}
+            justifyContent={"center"}
+            alignItems={"end"}
           >
             <Flex mb={1.5}>
-              <Skeleton h={'16px'} w={'150px'} />
+              <Skeleton h={"16px"} w={"150px"} />
             </Flex>
             <Flex>
-              <Skeleton h={'16px'} w={'200px'} />
+              <Skeleton h={"16px"} w={"200px"} />
             </Flex>
           </Flex>
         </CardBody>

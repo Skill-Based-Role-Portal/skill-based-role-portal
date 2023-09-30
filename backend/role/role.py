@@ -62,6 +62,7 @@ class Role(db.Model):
             'description': self.description,
             'hiring_manager': self.hiring_manager,
             'deadline': self.deadline,
+            'status': "Active" if self.deadline.date() >= datetime.today().date() else "Expired",
             'created': self.created,
             'modified': self.modified
         }

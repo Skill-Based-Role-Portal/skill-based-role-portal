@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+// General imports
+import { useState, useEffect } from "react";
+import RoleService from "../services/role.service";
 
-import RoleService from '../services/role.service';
-import CreateRoleListingSkeleton from '../components/skeletons/CreateRoleListingSkeleton';
+import { Formik, Field, Form } from "formik";
+import * as Yup from "yup";
 
-import { Formik, Field, Form } from 'formik';
-import * as Yup from 'yup';
+// Custom components
+import CreateRoleListingSkeleton from "../components/skeletons/CreateRoleListingSkeleton";
 
+// Chakra imports
 import {
   Box,
   Heading,
@@ -26,7 +29,7 @@ import {
   TagLabel,
   TagCloseButton,
   useToast,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
 export default function CreateRoleListing() {
   const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(true);
@@ -39,33 +42,33 @@ export default function CreateRoleListing() {
     today.getTime() - today.getTimezoneOffset() * 60000
   )
     .toISOString()
-    .split('T')[0];
+    .split("T")[0];
 
   const initialValues = {
-    name: '',
-    experience: '',
-    location: '',
-    department: '',
-    employmentType: '',
-    requirement: '',
-    description: '',
-    skills: '',
-    hiring_manager: '',
-    deadline: '',
+    name: "",
+    experience: "",
+    location: "",
+    department: "",
+    employmentType: "",
+    requirement: "",
+    description: "",
+    skills: "",
+    hiring_manager: "",
+    deadline: "",
   };
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Please enter the role name'),
-    experience: Yup.string().required('Please enter the experience level'),
-    location: Yup.string().required('Please enter the location'),
-    department: Yup.string().required('Please enter the department'),
-    employmentType: Yup.string().required('Please enter the employment type'),
-    requirement: Yup.string().required('Please enter the role requirement'),
-    description: Yup.string().required('Please enter the role description'),
-    hiring_manager: Yup.string().required('Please select the hiring manager'),
+    name: Yup.string().required("Please enter the role name"),
+    experience: Yup.string().required("Please enter the experience level"),
+    location: Yup.string().required("Please enter the location"),
+    department: Yup.string().required("Please enter the department"),
+    employmentType: Yup.string().required("Please enter the employment type"),
+    requirement: Yup.string().required("Please enter the role requirement"),
+    description: Yup.string().required("Please enter the role description"),
+    hiring_manager: Yup.string().required("Please select the hiring manager"),
     deadline: Yup.date()
-      .min(currentDate, 'Deadline must not be a past date')
-      .required('Please enter the role application deadline'),
+      .min(currentDate, "Deadline must not be a past date")
+      .required("Please enter the role application deadline"),
   });
 
   useEffect(() => {
@@ -102,33 +105,33 @@ export default function CreateRoleListing() {
     };
 
     RoleService.createRole(payload).then(
-      response => {
+      (response) => {
         setIsLoading(false);
         toast({
-          position: 'top',
-          status: 'success',
+          position: "top",
+          status: "success",
           isClosable: true,
-          title: 'Role Listing Created',
+          title: "Role Listing Created",
           description: `${name} Role has been created successfully.`,
         });
         actions.resetForm();
         setSelectedSkills([]);
       },
-      error => {
+      (error) => {
         setIsLoading(false);
 
         toast({
-          position: 'top',
-          status: 'error',
+          position: "top",
+          status: "error",
           isClosable: true,
-          title: 'Error Occured',
+          title: "Error Occured",
           description: error.response.data.message,
         });
       }
     );
   };
 
-  const resetFields = resetForm => {
+  const resetFields = (resetForm) => {
     resetForm();
     setSelectedSkills([]);
   };
@@ -136,37 +139,37 @@ export default function CreateRoleListing() {
   const handleSkillChange = (e, setFieldValue) => {
     const selectedSkill = e.target.value;
 
-    if (selectedSkill === '') {
+    if (selectedSkill === "") {
       return;
     }
 
     if (!selectedSkills.includes(selectedSkill)) {
       setSelectedSkills([...selectedSkills, selectedSkill]);
-      setFieldValue('skills', '');
+      setFieldValue("skills", "");
     }
   };
 
-  const handleRemoveSkill = skill => {
-    const updatedSkills = selectedSkills.filter(s => s !== skill);
+  const handleRemoveSkill = (skill) => {
+    const updatedSkills = selectedSkills.filter((s) => s !== skill);
     setSelectedSkills(updatedSkills);
   };
 
   return (
-    <Box px={5} py={8} w={'full'}>
+    <Box px={5} py={8} w={"full"}>
       {isLoadingSkeleton ? (
         <CreateRoleListingSkeleton />
       ) : (
         <Card
-          variant={'outline'}
-          backgroundColor={'gray.50'}
-          _dark={{ backgroundColor: 'gray.800' }}
+          variant={"outline"}
+          backgroundColor={"gray.50"}
+          _dark={{ backgroundColor: "gray.800" }}
         >
           <CardBody>
             <Heading
-              fontSize={'lg'}
-              fontWeight={'semibold'}
-              color={'gray.700'}
-              _dark={{ color: 'gray.400' }}
+              fontSize={"lg"}
+              fontWeight={"semibold"}
+              color={"gray.700"}
+              _dark={{ color: "gray.400" }}
               mb={5}
             >
               Create Role Listing
@@ -180,20 +183,20 @@ export default function CreateRoleListing() {
                 <Form>
                   <VStack
                     spacing={5}
-                    color={'gray.600'}
-                    _dark={{ color: 'gray.500' }}
+                    color={"gray.600"}
+                    _dark={{ color: "gray.500" }}
                   >
-                    <SimpleGrid columns={2} w={'full'} spacing={5}>
+                    <SimpleGrid columns={2} w={"full"} spacing={5}>
                       <Field name="name">
                         {({ field, form }) => (
                           <FormControl isInvalid={errors.name && touched.name}>
-                            <FormLabel fontSize={'sm'}>Role Name</FormLabel>
+                            <FormLabel fontSize={"sm"}>Role Name</FormLabel>
                             <Input
                               type="text"
                               placeholder="Enter Role Name"
-                              fontSize={'sm'}
-                              maxLength={'20'}
-                              focusBorderColor={'pink.300'}
+                              fontSize={"sm"}
+                              maxLength={"20"}
+                              focusBorderColor={"pink.300"}
                               variant="filled"
                               {...field}
                             />
@@ -209,15 +212,15 @@ export default function CreateRoleListing() {
                           <FormControl
                             isInvalid={errors.experience && touched.experience}
                           >
-                            <FormLabel fontSize={'sm'}>
+                            <FormLabel fontSize={"sm"}>
                               Experience Level
                             </FormLabel>
                             <Input
                               type="text"
                               placeholder="Enter Experience Level"
-                              fontSize={'sm'}
-                              maxLength={'50'}
-                              focusBorderColor={'pink.300'}
+                              fontSize={"sm"}
+                              maxLength={"50"}
+                              focusBorderColor={"pink.300"}
                               variant="filled"
                               {...field}
                             />
@@ -229,19 +232,19 @@ export default function CreateRoleListing() {
                       </Field>
                     </SimpleGrid>
 
-                    <SimpleGrid columns={2} w={'full'} spacing={5}>
+                    <SimpleGrid columns={2} w={"full"} spacing={5}>
                       <Field name="location">
                         {({ field, form }) => (
                           <FormControl
                             isInvalid={errors.location && touched.location}
                           >
-                            <FormLabel fontSize={'sm'}>Location</FormLabel>
+                            <FormLabel fontSize={"sm"}>Location</FormLabel>
                             <Input
                               type="text"
                               placeholder="Enter Location"
-                              fontSize={'sm'}
-                              maxLength={'50'}
-                              focusBorderColor={'pink.300'}
+                              fontSize={"sm"}
+                              maxLength={"50"}
+                              focusBorderColor={"pink.300"}
                               variant="filled"
                               {...field}
                             />
@@ -257,13 +260,13 @@ export default function CreateRoleListing() {
                           <FormControl
                             isInvalid={errors.department && touched.department}
                           >
-                            <FormLabel fontSize={'sm'}>Department</FormLabel>
+                            <FormLabel fontSize={"sm"}>Department</FormLabel>
                             <Input
                               type="text"
                               placeholder="Enter Department"
-                              fontSize={'sm'}
-                              maxLength={'50'}
-                              focusBorderColor={'pink.300'}
+                              fontSize={"sm"}
+                              maxLength={"50"}
+                              focusBorderColor={"pink.300"}
                               variant="filled"
                               {...field}
                             />
@@ -282,13 +285,13 @@ export default function CreateRoleListing() {
                             errors.employmentType && touched.employmentType
                           }
                         >
-                          <FormLabel fontSize={'sm'}>Employment Type</FormLabel>
+                          <FormLabel fontSize={"sm"}>Employment Type</FormLabel>
                           <Input
                             type="text"
                             placeholder="Enter Employment Type"
-                            fontSize={'sm'}
-                            maxLength={'50'}
-                            focusBorderColor={'pink.300'}
+                            fontSize={"sm"}
+                            maxLength={"50"}
+                            focusBorderColor={"pink.300"}
                             variant="filled"
                             {...field}
                           />
@@ -304,12 +307,12 @@ export default function CreateRoleListing() {
                         <FormControl
                           isInvalid={errors.requirement && touched.requirement}
                         >
-                          <FormLabel fontSize={'sm'}>Requirement</FormLabel>
+                          <FormLabel fontSize={"sm"}>Requirement</FormLabel>
                           <Textarea
                             placeholder="Enter Requirement"
-                            fontSize={'sm'}
-                            maxLength={'256'}
-                            focusBorderColor={'pink.300'}
+                            fontSize={"sm"}
+                            maxLength={"256"}
+                            focusBorderColor={"pink.300"}
                             variant="filled"
                             {...field}
                           />
@@ -325,12 +328,12 @@ export default function CreateRoleListing() {
                         <FormControl
                           isInvalid={errors.description && touched.description}
                         >
-                          <FormLabel fontSize={'sm'}>Description</FormLabel>
+                          <FormLabel fontSize={"sm"}>Description</FormLabel>
                           <Textarea
                             placeholder="Enter Description"
-                            fontSize={'sm'}
-                            maxLength={'256'}
-                            focusBorderColor={'pink.300'}
+                            fontSize={"sm"}
+                            maxLength={"256"}
+                            focusBorderColor={"pink.300"}
                             variant="filled"
                             {...field}
                           />
@@ -346,20 +349,20 @@ export default function CreateRoleListing() {
                         <FormControl
                           isInvalid={errors.skills && touched.skills}
                         >
-                          <FormLabel fontSize={'sm'}>Skills</FormLabel>
+                          <FormLabel fontSize={"sm"}>Skills</FormLabel>
                           <Select
                             placeholder="Select Skill"
-                            fontSize={'sm'}
-                            focusBorderColor={'pink.300'}
+                            fontSize={"sm"}
+                            focusBorderColor={"pink.300"}
                             variant="filled"
-                            onChange={e =>
+                            onChange={(e) =>
                               handleSkillChange(e, form.setFieldValue)
                             }
                             value={field.value}
                           >
-                            <option value={'HTML'}>HTML</option>
-                            <option value={'CSS'}>CSS</option>
-                            <option value={'JavaScript'}>JavaScript</option>
+                            <option value={"HTML"}>HTML</option>
+                            <option value={"CSS"}>CSS</option>
+                            <option value={"JavaScript"}>JavaScript</option>
                           </Select>
                           <FormErrorMessage name="skills">
                             {errors.skills}
@@ -367,14 +370,14 @@ export default function CreateRoleListing() {
                         </FormControl>
                       )}
                     </Field>
-                    <HStack w={'full'} spacing={2}>
-                      {selectedSkills.map(skill => (
+                    <HStack w={"full"} spacing={2}>
+                      {selectedSkills.map((skill) => (
                         <Tag
                           key={skill}
                           size="sm"
                           variant="subtle"
                           colorScheme="linkedin"
-                          color={'blue.500'}
+                          color={"blue.500"}
                           py={1}
                           px={2}
                         >
@@ -393,11 +396,11 @@ export default function CreateRoleListing() {
                             errors.hiring_manager && touched.hiring_manager
                           }
                         >
-                          <FormLabel fontSize={'sm'}>Hiring Manager</FormLabel>
+                          <FormLabel fontSize={"sm"}>Hiring Manager</FormLabel>
                           <Select
                             placeholder="Select Manager"
-                            fontSize={'sm'}
-                            focusBorderColor={'pink.300'}
+                            fontSize={"sm"}
+                            focusBorderColor={"pink.300"}
                             variant="filled"
                             {...field}
                           >
@@ -415,15 +418,15 @@ export default function CreateRoleListing() {
                         <FormControl
                           isInvalid={errors.deadline && touched.deadline}
                         >
-                          <FormLabel fontSize={'sm'}>
+                          <FormLabel fontSize={"sm"}>
                             Application Deadline
                           </FormLabel>
                           <Input
                             type="date"
                             placeholder="Select Application Deadline"
                             min={currentDate}
-                            fontSize={'sm'}
-                            focusBorderColor={'pink.300'}
+                            fontSize={"sm"}
+                            focusBorderColor={"pink.300"}
                             variant="filled"
                             {...field}
                           />
@@ -434,11 +437,11 @@ export default function CreateRoleListing() {
                       )}
                     </Field>
 
-                    <Flex w={'full'} justifyContent={'end'} mt={6}>
+                    <Flex w={"full"} justifyContent={"end"} mt={6}>
                       <Button
-                        colorScheme={'gray'}
-                        size={'md'}
-                        fontSize={'sm'}
+                        colorScheme={"gray"}
+                        size={"md"}
+                        fontSize={"sm"}
                         mr={2.5}
                         onClick={() => resetFields(resetForm)}
                       >
@@ -447,9 +450,9 @@ export default function CreateRoleListing() {
 
                       <Button
                         type="submit"
-                        colorScheme={'teal'}
-                        size={'md'}
-                        fontSize={'sm'}
+                        colorScheme={"teal"}
+                        size={"md"}
+                        fontSize={"sm"}
                         isLoading={isLoading}
                         isDisabled={!isValid}
                       >
