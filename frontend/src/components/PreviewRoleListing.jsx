@@ -172,7 +172,11 @@ export default function PreviewRoleListing(props) {
                 <Heading fontSize={"sm"} fontWeight={"semibold"} mb={2}>
                   Requirements
                 </Heading>
-                <Text fontSize={"sm"} fontWeight={"regular"}>
+                <Text
+                  fontSize={"sm"}
+                  fontWeight={"regular"}
+                  wordBreak={"break-word"}
+                >
                   {previewRole.requirement}
                 </Text>
               </Flex>
@@ -180,7 +184,11 @@ export default function PreviewRoleListing(props) {
                 <Heading fontSize={"sm"} fontWeight={"semibold"} mb={2}>
                   Description
                 </Heading>
-                <Text fontSize={"sm"} fontWeight={"regular"}>
+                <Text
+                  fontSize={"sm"}
+                  fontWeight={"regular"}
+                  wordBreak={"break-word"}
+                >
                   {previewRole.description}
                 </Text>
               </Flex>

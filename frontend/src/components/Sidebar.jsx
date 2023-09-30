@@ -58,11 +58,11 @@ export default function Sidebar() {
               icon={BiTable}
             />
 
-            <NavbarLink
+            {/* <NavbarLink
               name={"Create Role"}
               route={"create-role-listing"}
               icon={BiAddToQueue}
-            />
+            /> */}
           </NavbarGroup>
         </VStack>
       </Flex>

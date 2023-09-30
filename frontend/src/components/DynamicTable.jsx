@@ -246,7 +246,7 @@ export default function DynamicTable(props) {
               </Button>
               {pageSize === 5 ? (
                 <NumberInput
-                  max={pageCount - 1}
+                  max={pageCount}
                   min={1}
                   w={"50px"}
                   mx={"6px"}

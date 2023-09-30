@@ -104,7 +104,7 @@ export default function PreviewRoleListing(props) {
               />
               <IconButton
                 variant={"outline"}
-                aria-label="Bookmark role listing"
+                aria-label="Close Modal"
                 size={"lg"}
                 icon={<BiX />}
                 fontSize={"1.5rem"}
@@ -173,7 +173,11 @@ export default function PreviewRoleListing(props) {
               <Heading fontSize={"md"} fontWeight={"semibold"} mb={2}>
                 Requirements
               </Heading>
-              <Text fontSize={"md"} fontWeight={"regular"}>
+              <Text
+                fontSize={"md"}
+                fontWeight={"regular"}
+                wordBreak={"break-word"}
+              >
                 {previewRole.requirement}
               </Text>
             </Flex>
@@ -181,7 +185,11 @@ export default function PreviewRoleListing(props) {
               <Heading fontSize={"md"} fontWeight={"semibold"} mb={2}>
                 Description
               </Heading>
-              <Text fontSize={"md"} fontWeight={"regular"}>
+              <Text
+                fontSize={"md"}
+                fontWeight={"regular"}
+                wordBreak={"break-word"}
+              >
                 {previewRole.description}
               </Text>
             </Flex>

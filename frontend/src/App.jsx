@@ -1,9 +1,9 @@
 // General imports
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
-import Main from "./views/Main";
-import RoleListingsPage from "./views/RoleListings";
-import CreateRoleListingPage from "./views/CreateRoleListing";
+import Main from "./views/Dashboard/Main";
+import RoleListingsPage from "./views/RoleListings/RoleListings";
+import CreateRoleListingPage from "./views/RoleListings/CreateRoleListing";
 
 function App() {
   const router = createBrowserRouter([
@@ -19,10 +19,10 @@ function App() {
           path: "role-listings",
           element: <RoleListingsPage name={"Role Listings"} />,
         },
-        {
-          path: "create-role-listing",
-          element: <CreateRoleListingPage name={"Role Creation"} />,
-        },
+        // {
+        //   path: "create-role-listing",
+        //   element: <CreateRoleListingPage name={"Role Creation"} />,
+        // },
       ],
     },
   ]);

@@ -1,12 +1,9 @@
 // General imports
-import { useState, useEffect } from "react";
-import RoleService from "../services/role.service";
+import { useState, useRef } from "react";
+import RoleService from "../../../services/role.service";
 
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
-
-// Custom components
-import CreateRoleListingSkeleton from "../components/skeletons/CreateRoleListingSkeleton";
 
 // Chakra imports
 import {
@@ -19,20 +16,40 @@ import {
   Textarea,
   Select,
   VStack,
-  Button,
-  Card,
-  CardBody,
   SimpleGrid,
   Flex,
   Tag,
   HStack,
   TagLabel,
   TagCloseButton,
+  Button,
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 
-export default function CreateRoleListing() {
-  const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(true);
+// Icons
+import { BiX } from "react-icons/bi";
+
+export default function CreateModal({ refresh }) {
+  const modalSize = "6xl";
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const closeModal = () => {
+    setSelectedSkills([]);
+    onClose();
+  };
+
+  const initialRef = useRef(null);
+  const finalRef = useRef(null);
+  const scrollBehavior = "inside";
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const toast = useToast();
@@ -71,12 +88,6 @@ export default function CreateRoleListing() {
       .required("Please enter the role application deadline"),
   });
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoadingSkeleton(false);
-    }, 500);
-  }, []);
-
   const createRoleListing = (formValue, actions) => {
     const {
       name,
@@ -107,6 +118,7 @@ export default function CreateRoleListing() {
     RoleService.createRole(payload).then(
       (response) => {
         setIsLoading(false);
+        refresh();
         toast({
           position: "top",
           status: "success",
@@ -116,6 +128,7 @@ export default function CreateRoleListing() {
         });
         actions.resetForm();
         setSelectedSkills([]);
+        onClose();
       },
       (error) => {
         setIsLoading(false);
@@ -155,32 +168,55 @@ export default function CreateRoleListing() {
   };
 
   return (
-    <Box px={5} py={8} w={"full"}>
-      {isLoadingSkeleton ? (
-        <CreateRoleListingSkeleton />
-      ) : (
-        <Card
-          variant={"outline"}
-          backgroundColor={"gray.50"}
-          _dark={{ backgroundColor: "gray.800" }}
+    <>
+      <Button size={"md"} fontSize={"xs"} onClick={onOpen} ref={finalRef}>
+        Create Role Listing
+      </Button>
+
+      <Modal
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}
+        scrollBehavior={scrollBehavior}
+        closeOnOverlayClick={true}
+        isOpen={isOpen}
+        onClose={closeModal}
+        size={modalSize}
+      >
+        <ModalOverlay />
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={(values, actions) => createRoleListing(values, actions)}
         >
-          <CardBody>
-            <Heading
-              fontSize={"lg"}
-              fontWeight={"semibold"}
-              color={"gray.700"}
-              _dark={{ color: "gray.400" }}
-              mb={5}
-            >
-              Create Role Listing
-            </Heading>
-            <Formik
-              initialValues={initialValues}
-              validationSchema={validationSchema}
-              onSubmit={(values, actions) => createRoleListing(values, actions)}
-            >
-              {({ errors, touched, isValid, dirty, resetForm }) => (
-                <Form>
+          {({ errors, touched, isValid, dirty, resetForm }) => (
+            <Form>
+              <ModalContent
+                _dark={{ color: "gray.400", backgroundColor: "gray.800" }}
+                color={"gray.700"}
+                py={2}
+              >
+                <ModalHeader>
+                  <Flex justifyContent={"space-between"} alignItems={"center"}>
+                    <Heading
+                      fontSize={"2xl"}
+                      fontWeight={"semibold"}
+                      color={"gray.700"}
+                      _dark={{ color: "gray.400" }}
+                    >
+                      Create Role Listing
+                    </Heading>
+                    <IconButton
+                      variant={"outline"}
+                      aria-label="Close Modal"
+                      size={"lg"}
+                      icon={<BiX />}
+                      fontSize={"1.5rem"}
+                      color={"gray.500"}
+                      onClick={closeModal}
+                    />
+                  </Flex>
+                </ModalHeader>
+                <ModalBody>
                   <VStack
                     spacing={5}
                     color={"gray.600"}
@@ -437,35 +473,36 @@ export default function CreateRoleListing() {
                       )}
                     </Field>
 
-                    <Flex w={"full"} justifyContent={"end"} mt={6}>
-                      <Button
-                        colorScheme={"gray"}
-                        size={"md"}
-                        fontSize={"sm"}
-                        mr={2.5}
-                        onClick={() => resetFields(resetForm)}
-                      >
-                        Reset
-                      </Button>
-
-                      <Button
-                        type="submit"
-                        colorScheme={"teal"}
-                        size={"md"}
-                        fontSize={"sm"}
-                        isLoading={isLoading}
-                        isDisabled={!isValid}
-                      >
-                        Create Role Listing
-                      </Button>
-                    </Flex>
+                    <Flex w={"full"} justifyContent={"end"} mt={6}></Flex>
                   </VStack>
-                </Form>
-              )}
-            </Formik>
-          </CardBody>
-        </Card>
-      )}
-    </Box>
+                </ModalBody>
+
+                <ModalFooter>
+                  <Button
+                    colorScheme={"gray"}
+                    size={"md"}
+                    fontSize={"sm"}
+                    mr={2.5}
+                    onClick={() => resetFields(resetForm)}
+                  >
+                    Reset
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    colorScheme={"teal"}
+                    size={"md"}
+                    fontSize={"sm"}
+                    isLoading={isLoading}
+                  >
+                    Create Role Listing
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+    </>
   );
 }
