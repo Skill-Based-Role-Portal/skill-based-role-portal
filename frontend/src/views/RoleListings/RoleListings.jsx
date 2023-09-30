@@ -8,6 +8,9 @@ import { Flex, Text, Tag } from "@chakra-ui/react";
 // Custom components
 import DynamicTable from "../../components/DynamicTable";
 import CreateModal from "./Components/CreateModal";
+import RoleListingSkeleton from "../../components/skeletons/RoleListingsTableSkeleton";
+
+// Helper
 import SimpleDate from "../../helper/SimpleDate";
 
 export default function RoleListings() {
@@ -107,12 +110,16 @@ export default function RoleListings() {
 
   return (
     <Flex px={5} py={8} flexDirection={"column"} h={"full"}>
-      <DynamicTable
-        title="Role Listings Table"
-        createItem={<CreateModal refresh={refreshData} />}
-        tableData={roles}
-        columnsData={columnsData}
-      />
+      {isLoading ? (
+        <RoleListingSkeleton />
+      ) : (
+        <DynamicTable
+          title="Role Listings Table"
+          createItem={<CreateModal refresh={refreshData} />}
+          tableData={roles}
+          columnsData={columnsData}
+        />
+      )}
     </Flex>
   );
 }
