@@ -18,6 +18,7 @@ import {
   SimpleGrid,
   Flex,
   Tag,
+  Text,
   HStack,
   TagLabel,
   TagCloseButton,
@@ -32,6 +33,9 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+
+// Helpers
+import DateTimeFormat from "../../../helper/DateTimeFormat";
 
 // Icons
 import { BiX } from "react-icons/bi";
@@ -48,6 +52,7 @@ export default function EditModal({
   hiring_manager,
   deadline,
   skills,
+  modified,
   refresh,
 }) {
   const modalSize = "6xl";
@@ -495,26 +500,32 @@ export default function EditModal({
                   </VStack>
                 </ModalBody>
 
-                <ModalFooter>
-                  <Button
-                    colorScheme={"gray"}
-                    size={"md"}
-                    fontSize={"sm"}
-                    mr={2.5}
-                    onClick={() => resetFields(resetForm)}
-                  >
-                    Reset
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    colorScheme={"teal"}
-                    size={"md"}
-                    fontSize={"sm"}
-                    isLoading={isLoading}
-                  >
-                    Update
-                  </Button>
+                <ModalFooter justifyContent={"space-between"}>
+                  <Flex>
+                    <Text fontSize={"xs"} color={"gray.600"}>
+                      Last Modified: {DateTimeFormat(modified)}
+                    </Text>
+                  </Flex>
+                  <Flex>
+                    <Button
+                      colorScheme={"gray"}
+                      size={"md"}
+                      fontSize={"sm"}
+                      mr={2.5}
+                      onClick={() => resetFields(resetForm)}
+                    >
+                      Reset
+                    </Button>
+                    <Button
+                      type="submit"
+                      colorScheme={"teal"}
+                      size={"md"}
+                      fontSize={"sm"}
+                      isLoading={isLoading}
+                    >
+                      Update
+                    </Button>
+                  </Flex>
                 </ModalFooter>
               </ModalContent>
             </Form>

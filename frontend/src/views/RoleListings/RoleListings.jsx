@@ -111,6 +111,7 @@ export default function RoleListings() {
             hiring_manager={row.original.hiring_manager}
             deadline={new Date(row.original.deadline)}
             skills={row.original.skills}
+            modified={row.original.modified}
           />
         </Flex>
       ),
