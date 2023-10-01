@@ -1,9 +1,12 @@
-import { Outlet, useOutlet } from 'react-router-dom';
+// General imports
+import { Outlet, useOutlet } from "react-router-dom";
 
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
+// Chakra imports
+import { ChakraProvider, theme, Flex } from "@chakra-ui/react";
 
-import { ChakraProvider, theme, Flex } from '@chakra-ui/react';
+// Custom components
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 
 export default function MainLayout() {
   const { props } = useOutlet();
@@ -14,7 +17,7 @@ export default function MainLayout() {
         position="relative"
         bgColor="gray.100"
         color="gray.700"
-        _dark={{ bgColor: 'gray.800', color: 'gray.300' }}
+        _dark={{ bgColor: "gray.800", color: "gray.300" }}
         minH="100vh"
       >
         <Sidebar />

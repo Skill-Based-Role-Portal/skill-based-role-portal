@@ -1,4 +1,7 @@
+// Chakra imports
 import { useColorMode, useColorModeValue, IconButton } from "@chakra-ui/react";
+
+// Icons
 import { BiMoon, BiSun } from "react-icons/bi";
 
 export const ColorModeSwitcher = (props) => {

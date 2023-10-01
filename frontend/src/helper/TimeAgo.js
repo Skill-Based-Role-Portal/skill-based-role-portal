@@ -6,7 +6,7 @@ export default function TimeAgo(dateString) {
 
   if (timeDifference < oneDayInMilliseconds) {
     // Less than 1 day ago
-    return '24h';
+    return "24h";
   } else {
     // More than 1 day ago
     const daysAgo = Math.ceil(timeDifference / oneDayInMilliseconds);

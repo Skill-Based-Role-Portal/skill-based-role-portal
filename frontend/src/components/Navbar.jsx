@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
+// General imports
+import { useNavigate } from "react-router-dom";
 
+// Chakra imports
 import {
   Flex,
   Text,
@@ -13,35 +14,40 @@ import {
   MenuDivider,
   Heading,
   Divider,
-} from '@chakra-ui/react';
-import { ChevronDownIcon } from '@chakra-ui/icons';
+} from "@chakra-ui/react";
+
+// Custom components
+import { ColorModeSwitcher } from "./ColorModeSwitcher";
+
+// Icons
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 export default function Navbar(props) {
   const { routeName } = props;
   const navigate = useNavigate();
 
   const handleLogout = (values, actions) => {
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
     <Flex
-      bgColor={'gray.50'}
-      _dark={{ bgColor: 'gray.700', borderColor: 'gray.600' }}
-      borderBottom={'1.5px'}
-      borderStyle={'solid'}
-      borderColor={'gray.200'}
-      alignItems={'center'}
-      justifyContent={{ base: 'space-between' }}
-      minH={'80px'}
+      bgColor={"gray.50"}
+      _dark={{ bgColor: "gray.700", borderColor: "gray.600" }}
+      borderBottom={"1.5px"}
+      borderStyle={"solid"}
+      borderColor={"gray.200"}
+      alignItems={"center"}
+      justifyContent={{ base: "space-between" }}
+      minH={"80px"}
       px={8}
     >
       <Flex>
         <Heading
-          fontSize={'sm'}
-          fontWeight={'semibold'}
-          color={'gray.600'}
-          _dark={{ color: 'gray.400' }}
+          fontSize={"sm"}
+          fontWeight={"semibold"}
+          color={"gray.600"}
+          _dark={{ color: "gray.400" }}
         >
           {routeName}
         </Heading>
@@ -49,37 +55,37 @@ export default function Navbar(props) {
       <Flex>
         <ColorModeSwitcher
           mr={3}
-          color={'gray.500'}
-          _dark={{ color: 'gray.400' }}
+          color={"gray.500"}
+          _dark={{ color: "gray.400" }}
         />
-        <Divider orientation={'vertical'} height={'40px'} />
+        <Divider orientation={"vertical"} height={"40px"} />
         <Menu>
           <MenuButton
             as={Button}
             leftIcon={
               <Avatar
-                size={'sm'}
-                name={'Peter Parker'}
-                src={'https://bit.ly/kent-c-dodds'}
+                size={"sm"}
+                name={"Peter Parker"}
+                src={"https://bit.ly/kent-c-dodds"}
                 mr={1}
               />
             }
             rightIcon={<ChevronDownIcon />}
-            variant={'none'}
-            fontSize={'sm'}
+            variant={"none"}
+            fontSize={"sm"}
           >
-            <Flex flexDirection={'column'} alignItems={'start'} mr={1}>
-              <Text fontSize={'sm'} fontWeight={'semibold'} mb={0.5}>
+            <Flex flexDirection={"column"} alignItems={"start"} mr={1}>
+              <Text fontSize={"sm"} fontWeight={"semibold"} mb={0.5}>
                 Peter Parker
               </Text>
               <Flex>
-                <Text fontSize={'xs'} fontWeight={'medium'} color={'gray.500'}>
+                <Text fontSize={"xs"} fontWeight={"medium"} color={"gray.500"}>
                   Staff
                 </Text>
               </Flex>
             </Flex>
           </MenuButton>
-          <MenuList fontSize={'sm'}>
+          <MenuList fontSize={"sm"}>
             <MenuItem>Profile</MenuItem>
             <MenuItem>Settings</MenuItem>
             <MenuDivider />

@@ -1,14 +1,15 @@
+// General imports
 import { useState, useEffect } from "react";
+import RoleService from "../../services/role.service";
 
+// Chakra imports
 import { Grid, GridItem, Flex, VStack, Tag } from "@chakra-ui/react";
 
-import RoleService from "../services/role.service";
-
-import RoleListing from "../components/RoleListing";
-import PreviewRoleListing from "../components/PreviewRoleListing";
-
-import RoleListingSkeleton from "../components/skeletons/RoleListingSkeleton";
-import PreviewRoleListingSkeleton from "../components/skeletons/PreviewRoleListingSkeleton";
+// Custom components
+import RoleListing from "../../components/RoleListing";
+import PreviewRoleListing from "../../components/PreviewRoleListing";
+import RoleListingSkeleton from "../../components/skeletons/RoleListingSkeleton";
+import PreviewRoleListingSkeleton from "../../components/skeletons/PreviewRoleListingSkeleton";
 
 export default function Main() {
   const calculatedMaxHeight = `calc(100vh - 80px - 4rem)`;
