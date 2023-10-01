@@ -199,5 +199,73 @@ def create_role():
         }
     ), 201
 
+
+@app.route("/role/<role_id>", methods=['PUT'])
+def update_role(role_id):
+    role = Role.query.filter_by(role_id=role_id).first()
+
+    if role:
+        data = request.get_json()
+
+        if data['name']:
+            if (Role.query.filter_by(name=data['name']).filter(Role.role_id != role_id).first()):
+                return jsonify(
+                    {
+                        "code": 400,
+                        "data": {
+                            "name": data['name']
+                        },
+                        "message": "Role already exists."
+                    }
+                ), 400
+
+            for skill in role.role_skills:
+                db.session.delete(skill)
+            role.name = data['name']
+
+        if data['experience']:
+            role.experience = data['experience']
+        if data['location']:
+            role.location = data['location']
+        if data['department']:
+            role.department = data['department']
+        if data['employment_type']:
+            role.employment_type = data['employment_type']
+        if data['requirement']:
+            role.requirement = data['requirement']
+        if data['description']:
+            role.description = data['description']
+        if data['hiring_manager']:
+            role.hiring_manager = data['hiring_manager']
+        if data['deadline']:
+            role.deadline = data['deadline']
+
+        if 'skills' in data:
+            for skill in role.role_skills:
+                db.session.delete(skill)
+
+            for skill_name in data['skills']:
+                role_skill = Role_Skill(
+                    role_name=role.name, skill_name=skill_name)
+                db.session.add(role_skill)
+
+        db.session.commit()
+        return jsonify(
+            {
+                "code": 200,
+                "data": role.json()
+            }
+        )
+
+    return jsonify(
+        {
+            "code": 404,
+            "data": {
+                "role_id": role_id
+            },
+            "message": "Role not found."
+        }
+    ), 404
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5003, debug=True)

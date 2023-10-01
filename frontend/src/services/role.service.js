@@ -18,11 +18,16 @@ const createRole = (payload) => {
   return axios.post(API_URL, { ...payload });
 };
 
+const updateRole = (id, payload) => {
+  return axios.put(API_URL + "/" + id, { ...payload });
+};
+
 const RoleService = {
   getRoles,
   getActiveRoles,
   getRoleById,
   createRole,
+  updateRole,
 };
 
 export default RoleService;
