@@ -4,9 +4,14 @@ export default function DateTimeFormat(dateString) {
   const day = date.getDate();
   const month = date.toLocaleString("en-US", { month: "short" });
   const year = date.getFullYear();
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const seconds = date.getSeconds();
+
+  const HH = date.getHours();
+  const MM = date.getMinutes();
+  const SS = date.getSeconds();
+
+  const hours = ("0" + HH).slice(-2);
+  const minutes = ("0" + MM).slice(-2);
+  const seconds = ("0" + SS).slice(-2);
 
   return isNaN(date)
     ? "31 Dec 9999 00:00:00"
