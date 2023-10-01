@@ -36,11 +36,24 @@ import {
 // Icons
 import { BiX } from "react-icons/bi";
 
-export default function CreateModal({ refresh }) {
+export default function EditModal({
+  role_id,
+  name,
+  experience,
+  location,
+  department,
+  employment_type,
+  requirement,
+  description,
+  hiring_manager,
+  deadline,
+  skills,
+  refresh,
+}) {
   const modalSize = "6xl";
   const { isOpen, onOpen, onClose } = useDisclosure();
   const closeModal = () => {
-    setSelectedSkills([]);
+    setSelectedSkills(skills);
     onClose();
   };
 
@@ -49,7 +62,7 @@ export default function CreateModal({ refresh }) {
   const scrollBehavior = "inside";
 
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState(skills);
   const toast = useToast();
 
   const today = new Date();
@@ -60,16 +73,18 @@ export default function CreateModal({ refresh }) {
     .split("T")[0];
 
   const initialValues = {
-    name: "",
-    experience: "",
-    location: "",
-    department: "",
-    employment_type: "",
-    requirement: "",
-    description: "",
+    name: name,
+    experience: experience,
+    location: location,
+    department: department,
+    employment_type: employment_type,
+    requirement: requirement,
+    description: description,
     skills: "",
-    hiring_manager: "",
-    deadline: "",
+    hiring_manager: hiring_manager,
+    deadline: `${deadline.getFullYear()}-${String(
+      deadline.getMonth() + 1
+    ).padStart(2, "0")}-${String(deadline.getDate()).padStart(2, "0")}`,
   };
 
   const validationSchema = Yup.object().shape({
@@ -86,7 +101,7 @@ export default function CreateModal({ refresh }) {
       .required("Please enter the role application deadline"),
   });
 
-  const createRoleListing = (formValue, actions) => {
+  const updateRoleListing = (formValue, actions) => {
     const {
       name,
       experience,
@@ -113,7 +128,7 @@ export default function CreateModal({ refresh }) {
       deadline: deadline,
     };
 
-    RoleService.createRole(payload).then(
+    RoleService.updateRole(role_id, payload).then(
       (response) => {
         setIsLoading(false);
         refresh();
@@ -121,11 +136,9 @@ export default function CreateModal({ refresh }) {
           position: "top",
           status: "success",
           isClosable: true,
-          title: "Role Listing Created",
-          description: `${name} Role has been created successfully.`,
+          title: `${name} Updated`,
+          description: `${name} Role has been updated successfully.`,
         });
-        actions.resetForm();
-        setSelectedSkills([]);
         onClose();
       },
       (error) => {
@@ -144,7 +157,7 @@ export default function CreateModal({ refresh }) {
 
   const resetFields = (resetForm) => {
     resetForm();
-    setSelectedSkills([]);
+    setSelectedSkills(skills);
   };
 
   const handleSkillChange = (e, setFieldValue) => {
@@ -168,13 +181,14 @@ export default function CreateModal({ refresh }) {
   return (
     <>
       <Button
-        size={"md"}
+        size={"sm"}
         fontSize={"xs"}
-        colorScheme={"teal"}
+        color={"gray.600"}
+        _dark={{ color: "gray.400" }}
         onClick={onOpen}
         ref={finalRef}
       >
-        Create Role Listing
+        Edit
       </Button>
 
       <Modal
@@ -190,7 +204,7 @@ export default function CreateModal({ refresh }) {
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={(values, actions) => createRoleListing(values, actions)}
+          onSubmit={(values, actions) => updateRoleListing(values, actions)}
         >
           {({ errors, touched, isValid, dirty, resetForm }) => (
             <Form>
@@ -207,7 +221,7 @@ export default function CreateModal({ refresh }) {
                       color={"gray.700"}
                       _dark={{ color: "gray.400" }}
                     >
-                      Create Role Listing
+                      Edit {name}
                     </Heading>
                     <IconButton
                       variant={"outline"}
@@ -499,7 +513,7 @@ export default function CreateModal({ refresh }) {
                     fontSize={"sm"}
                     isLoading={isLoading}
                   >
-                    Create
+                    Update
                   </Button>
                 </ModalFooter>
               </ModalContent>

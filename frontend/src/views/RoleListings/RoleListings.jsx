@@ -8,6 +8,7 @@ import { Flex, Text, Tag } from "@chakra-ui/react";
 // Custom components
 import DynamicTable from "../../components/DynamicTable";
 import CreateModal from "./Components/CreateModal";
+import EditModal from "./Components/EditModal";
 import RoleListingSkeleton from "../../components/skeletons/RoleListingsTableSkeleton";
 
 // Helper
@@ -58,11 +59,6 @@ export default function RoleListings() {
       Cell: ({ row }) => <Text>{row.original.name}</Text>,
     },
     {
-      Header: "EXPERIENCE",
-      accessor: "experience",
-      Cell: ({ row }) => <Text>{row.original.experience}</Text>,
-    },
-    {
       Header: "LOCATION",
       accessor: "location",
       Cell: ({ row }) => <Text>{row.original.location}</Text>,
@@ -71,11 +67,6 @@ export default function RoleListings() {
       Header: "DEPARTMENT",
       accessor: "department",
       Cell: ({ row }) => <Text>{row.original.department}</Text>,
-    },
-    {
-      Header: "EMPLOYMENT TYPE",
-      accessor: "employment_type",
-      Cell: ({ row }) => <Text>{row.original.employment_type}</Text>,
     },
     {
       Header: "HIRING MANAGER",
@@ -97,14 +88,32 @@ export default function RoleListings() {
         ),
     },
     {
-      Header: "CREATED",
-      accessor: "created",
-      Cell: ({ row }) => <Text>{SimpleDate(row.original.created)}</Text>,
-    },
-    {
       Header: "DEADLINE",
       accessor: "deadline",
       Cell: ({ row }) => <Text>{SimpleDate(row.original.deadline)}</Text>,
+    },
+    {
+      Header: "ACTIONS",
+      disableSortBy: true,
+      Cell: ({ row }) => (
+        <Flex>
+          <EditModal
+            refresh={refreshData}
+            key={row.original.role_id}
+            role_id={row.original.role_id}
+            name={row.original.name}
+            experience={row.original.experience}
+            location={row.original.location}
+            department={row.original.department}
+            employment_type={row.original.employment_type}
+            requirement={row.original.requirement}
+            description={row.original.description}
+            hiring_manager={row.original.hiring_manager}
+            deadline={new Date(row.original.deadline)}
+            skills={row.original.skills}
+          />
+        </Flex>
+      ),
     },
   ];
 

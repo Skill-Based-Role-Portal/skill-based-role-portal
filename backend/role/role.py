@@ -219,13 +219,18 @@ def update_role(role_id):
                     }
                 ), 400
 
+            for skill in role.role_skills:
+                db.session.delete(skill)
             role.name = data['name']
+
         if data['experience']:
             role.experience = data['experience']
         if data['location']:
             role.location = data['location']
         if data['department']:
             role.department = data['department']
+        if data['employment_type']:
+            role.employment_type = data['employment_type']
         if data['requirement']:
             role.requirement = data['requirement']
         if data['description']:
