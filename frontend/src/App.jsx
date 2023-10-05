@@ -1,11 +1,16 @@
 // General imports
+import { useSelector } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import Main from "./views/Dashboard/Main";
 import RoleListingsPage from "./views/RoleListings/RoleListings";
-import CreateRoleListingPage from "./views/RoleListings/CreateRoleListing";
+import Login from "./views/Auth/Login";
 
 function App() {
+  const { user: currentUser } = useSelector((state) => state.auth);
+
+  const isHumanResource = currentUser?.access_rights === "Human Resource";
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -15,15 +20,15 @@ function App() {
           path: "",
           element: <Main name={"Home"} />,
         },
-        {
+        isHumanResource && {
           path: "role-listings",
           element: <RoleListingsPage name={"Role Listings"} />,
         },
-        // {
-        //   path: "create-role-listing",
-        //   element: <CreateRoleListingPage name={"Role Creation"} />,
-        // },
       ],
+    },
+    {
+      path: "/login",
+      element: <Login />,
     },
   ]);
 
