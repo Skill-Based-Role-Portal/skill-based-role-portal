@@ -6,65 +6,69 @@ import RoleService from "../../services/role.service";
 import { Grid, GridItem, Flex, VStack, Tag } from "@chakra-ui/react";
 
 // Custom components
+import SearchBar from "../../components/SearchBar"
 import RoleListing from "../../components/RoleListing";
 import PreviewRoleListing from "../../components/PreviewRoleListing";
 import RoleListingSkeleton from "../../components/skeletons/RoleListingSkeleton";
 import PreviewRoleListingSkeleton from "../../components/skeletons/PreviewRoleListingSkeleton";
 
 export default function Main() {
-  const calculatedMaxHeight = `calc(100vh - 80px - 4rem)`;
+  const calculatedMaxHeight = `calc(100vh - 80px - 4rem - 4rem)`;
   const numberOfSkeletons = 3;
   const skeletons = [];
 
   const [isLoading, setIsLoading] = useState(true);
   const [isPreviewLoading, setIsPreviewLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
   const [roles, setRoles] = useState([]);
+  const [filteredRoles, setFilteredRoles] = useState([]);
   const [previewRole, setPreviewRole] = useState({});
 
   useEffect(() => {
     fetchActiveRoles();
   }, []);
 
+  const handleSearchChange = (value) => {
+    const newFilteredRoles = roles.filter((role) =>
+      Object.values(role).some((field) =>
+        String(field).toLowerCase().includes(value.toLowerCase())
+      )
+    );
+
+    setFilteredRoles(newFilteredRoles);
+    fetchRoleById(newFilteredRoles[0]?.role_id);
+  };
+
   const fetchActiveRoles = () => {
     RoleService.getActiveRoles().then(
       (response) => {
         const rolesData = response.data.data.roles;
         setRoles(rolesData);
+        setFilteredRoles(rolesData);
         fetchRoleById(rolesData[0]?.role_id);
-        setTimeout(() => {
-          setIsLoading(false);
-          setIsPreviewLoading(false);
-        }, 500);
       },
       (error) => {
+        setRoles([]);
+      }).finally(
         setTimeout(() => {
           setIsLoading(false);
           setIsPreviewLoading(false);
-        }, 500);
-        setIsError(true);
-        setRoles([]);
-      }
-    );
+        }, 600)
+      )
   };
 
   const fetchRoleById = (roleId) => {
     RoleService.getRoleById(roleId).then(
       (response) => {
         setPreviewRole(response.data.data);
-        setTimeout(() => {
-          setIsLoading(false);
-          setIsPreviewLoading(false);
-        }, 500);
       },
       (error) => {
-        setTimeout(() => {
-          setIsLoading(false);
-          setIsPreviewLoading(false);
-        }, 500);
-        setIsError(true);
         setPreviewRole([]);
       }
+    ).finally(
+      setTimeout(() => {
+        setIsLoading(false);
+        setIsPreviewLoading(false);
+      }, 600)
     );
   };
 
@@ -77,11 +81,14 @@ export default function Main() {
     fetchRoleById(roleId);
     setTimeout(() => {
       setIsPreviewLoading(false);
-    }, 500);
+    }, 600);
   };
 
   return (
     <Flex px={5} py={8} flexDirection={"column"} h={"full"}>
+      <Flex mb={4}>
+        <SearchBar onSearchChange={handleSearchChange} />
+      </Flex>
       <Flex flexDirection={"column"} h={"full"}>
         <Grid
           templateColumns={"repeat(12, 1fr)"}
@@ -98,16 +105,12 @@ export default function Main() {
             >
               {isLoading ? (
                 skeletons
-              ) : isError ? (
-                <Tag colorScheme={"red"} py={2} px={3}>
-                  Something went wrong...
-                </Tag>
-              ) : roles.length === 0 ? (
+              ) : filteredRoles.length === 0 ? (
                 <Tag colorScheme={"facebook"} py={2} px={3}>
                   No Roles found...
                 </Tag>
               ) : (
-                roles.map((role) => (
+                filteredRoles.map((role) => (
                   <RoleListing
                     key={role.role_id}
                     role={role}
@@ -120,9 +123,7 @@ export default function Main() {
           <GridItem colSpan={{ base: 8 }}>
             {isLoading || isPreviewLoading ? (
               <PreviewRoleListingSkeleton />
-            ) : isError ? (
-              <></>
-            ) : roles.length === 0 ? (
+            ) : filteredRoles.length === 0 ? (
               <></>
             ) : (
               <PreviewRoleListing previewRole={previewRole} />
