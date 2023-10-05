@@ -145,6 +145,23 @@ services:
       - PMA_ARBITRARY=1
 
   #################################
+  # Staff: The Staff microservice
+  #################################
+  staff:
+    image: sbrp/staff:1.0
+    build:
+      context: .
+      dockerfile: backend/staff/Dockerfile
+    restart: always
+    networks:
+      - internal
+    ports:
+      - "5001:5001"
+    environment:
+      PYTHONUNBUFFERED: 1
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/staff
+
+  #################################
   # Role: The Role microservice
   #################################
   role:

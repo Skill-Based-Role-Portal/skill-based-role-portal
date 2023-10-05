@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_bcrypt import BCrypt
 from os import environ
 
 from datetime import datetime
@@ -15,6 +16,8 @@ db = SQLAlchemy(app)
 
 CORS(app)
 
+bcrypt = BCrypt(app)
+
 class Staff(db.Model):
     __tablename__ = 'staffs'
 
@@ -24,6 +27,7 @@ class Staff(db.Model):
     department = db.Column(db.String(50), nullable=False)
     country = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(60), nullable=False)
 
     # Add a foreign key relationship to the Access table
     access_rights_id = db.Column(db.Integer, db.ForeignKey('access.access_id'))
@@ -34,12 +38,13 @@ class Staff(db.Model):
     is_active = db.Column(db.Boolean, default=False, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
-    def __init__(self, first_name, last_name, department, country, email, access_rights, is_active):
+    def __init__(self, first_name, last_name, department, country, email, password, access_rights, is_active):
         self.first_name = first_name
         self.last_name = last_name
         self.department = department
         self.country = country
         self.email = email
+        self.password = bcrypt.generate_password_hash(password).decode('utf8')
 
         # Check if the provided access_rights exists in the Access table
         access = Access.query.filter_by(access_id=access_rights).first()
@@ -52,6 +57,7 @@ class Staff(db.Model):
 
     def json(self):
         return {"staff_id": self.staff_id, "first_name": self.first_name, "last_name": self.last_name, "department": self.department, "country": self.country, "email": self.email, "access_rights": self.access_rights.access_type, "is_active": self.is_active, "created": self.created}
+
 
 class Access(db.Model):
     __tablename__ = 'access'
@@ -83,9 +89,9 @@ with app.app_context():
     # Populate Staff
     existing_staff_1 = db.session.query(Staff).filter(Staff.staff_id == 1).first()
     if not existing_staff_1:
-      new_staff_1 = Staff(first_name="Peter", last_name="Parker", department="Finance", country="Singapore", email="peter.parker@aio.com", access_rights=1, is_active=1)
-      new_staff_2 = Staff(first_name="Nick", last_name="Fury", department="Human Resources", country="Singapore", email="nick.fury@aio.com", access_rights=2, is_active=1)
-      new_staff_3 = Staff(first_name="Tony", last_name="Stark", department="Information Technology", country="Singapore", email="tony.stark@aio.com", access_rights=3, is_active=1)
+      new_staff_1 = Staff(first_name="Peter", last_name="Parker", department="Finance", country="Singapore", email="peter.parker@aio.com", password="password" access_rights=1, is_active=1)
+      new_staff_2 = Staff(first_name="Nick", last_name="Fury", department="Human Resources", country="Singapore", email="nick.fury@aio.com", password="password" access_rights=2, is_active=1)
+      new_staff_3 = Staff(first_name="Tony", last_name="Stark", department="Information Technology", country="Singapore", email="tony.stark@aio.com", password="password" access_rights=3, is_active=1)
 
       db.session.add_all([new_staff_1, new_staff_2, new_staff_3])
 
@@ -147,6 +153,41 @@ def find_by_email(email):
         }
     ), 404
 
+
+@app.route("/staff/login", methods=["POST"])
+def login():
+    data = request.get_json()
+
+    if data['email']:
+        email = data['email']
+    if data['password']:
+        password = data['password']
+
+    staff = Staff.query.filter_by(email=email).first()
+
+    if staff:
+        if bcrypt.check_password_hash(staff.password, password):
+            return jsonify(
+                {
+                    "code": 200,
+                    "message": "Login successful",
+                    "data": staff.json()
+                }
+            ), 200
+        else:
+            return jsonify(
+                {
+                    "code": 401,
+                    "message": "Invalid credentials"
+                }
+            ), 401
+
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Staff not found."
+        }
+    ), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
