@@ -29,22 +29,22 @@ export default function RoleListings() {
   }, [refresh]);
 
   const fetchRoles = () => {
-    RoleService.getRoles().then(
-      (response) => {
-        const rolesData = response.data.data.roles;
-        setRoles(rolesData);
+    RoleService.getRoles()
+      .then(
+        (response) => {
+          const rolesData = response.data.data.roles;
+          setRoles(rolesData);
+        },
+        (error) => {
+          setIsError(true);
+          setRoles([]);
+        }
+      )
+      .finally(
         setTimeout(() => {
           setIsLoading(false);
-        }, 500);
-      },
-      (error) => {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 500);
-        setIsError(true);
-        setRoles([]);
-      }
-    );
+        }, 600)
+      );
   };
 
   const columnsData = [

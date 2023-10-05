@@ -1,5 +1,7 @@
 // General imports
-import { Outlet, useOutlet } from "react-router-dom";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { Outlet, useOutlet, useNavigate } from "react-router-dom";
 
 // Chakra imports
 import { ChakraProvider, theme, Flex } from "@chakra-ui/react";
@@ -10,6 +12,15 @@ import Sidebar from "../components/Sidebar";
 
 export default function MainLayout() {
   const { props } = useOutlet();
+  const navigate = useNavigate();
+
+  const { user: currentUser } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/login");
+    }
+  }, []);
 
   return (
     <ChakraProvider theme={theme}>

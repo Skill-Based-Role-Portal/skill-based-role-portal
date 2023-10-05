@@ -1,4 +1,5 @@
 // General imports
+import { useSelector } from "react-redux";
 import { Link as ReactRouterLink } from "react-router-dom";
 
 // Chakra imports
@@ -10,9 +11,11 @@ import NavbarGroup from "./NavbarGroup";
 import NavbarLink from "./NavbarLink";
 
 // Icons
-import { BiHomeAlt, BiTable, BiAddToQueue } from "react-icons/bi";
+import { BiHomeAlt, BiTable } from "react-icons/bi";
 
 export default function Sidebar() {
+  const { user: currentUser } = useSelector((state) => state.auth);
+
   return (
     <Flex
       bgColor={"gray.50"}
@@ -51,19 +54,15 @@ export default function Sidebar() {
             <NavbarLink name={"Home"} route={""} icon={BiHomeAlt} />
           </NavbarGroup>
 
-          <NavbarGroup groupName={"Role Listing"}>
-            <NavbarLink
-              name={"Role Listings"}
-              route={"role-listings"}
-              icon={BiTable}
-            />
-
-            {/* <NavbarLink
-              name={"Create Role"}
-              route={"create-role-listing"}
-              icon={BiAddToQueue}
-            /> */}
-          </NavbarGroup>
+          {currentUser?.access_rights === "Human Resource" && (
+            <NavbarGroup groupName={"Role Listing"}>
+              <NavbarLink
+                name={"Role Listings"}
+                route={"role-listings"}
+                icon={BiTable}
+              />
+            </NavbarGroup>
+          )}
         </VStack>
       </Flex>
     </Flex>

@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_bcrypt import BCrypt
+from flask_bcrypt import Bcrypt
 from os import environ
 
 from datetime import datetime
@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 
 CORS(app)
 
-bcrypt = BCrypt(app)
+bcrypt = Bcrypt(app)
 
 class Staff(db.Model):
     __tablename__ = 'staffs'
@@ -89,9 +89,9 @@ with app.app_context():
     # Populate Staff
     existing_staff_1 = db.session.query(Staff).filter(Staff.staff_id == 1).first()
     if not existing_staff_1:
-      new_staff_1 = Staff(first_name="Peter", last_name="Parker", department="Finance", country="Singapore", email="peter.parker@aio.com", password="password" access_rights=1, is_active=1)
-      new_staff_2 = Staff(first_name="Nick", last_name="Fury", department="Human Resources", country="Singapore", email="nick.fury@aio.com", password="password" access_rights=2, is_active=1)
-      new_staff_3 = Staff(first_name="Tony", last_name="Stark", department="Information Technology", country="Singapore", email="tony.stark@aio.com", password="password" access_rights=3, is_active=1)
+      new_staff_1 = Staff(first_name="Peter", last_name="Parker", department="Finance", country="Singapore", email="peter.parker@aio.com", password="password", access_rights=1, is_active=1)
+      new_staff_2 = Staff(first_name="Nick", last_name="Fury", department="Human Resources", country="Singapore", email="nick.fury@aio.com", password="password", access_rights=2, is_active=1)
+      new_staff_3 = Staff(first_name="Tony", last_name="Stark", department="Information Technology", country="Singapore", email="tony.stark@aio.com", password="password", access_rights=3, is_active=1)
 
       db.session.add_all([new_staff_1, new_staff_2, new_staff_3])
 

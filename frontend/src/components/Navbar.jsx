@@ -1,5 +1,7 @@
 // General imports
+import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 // Chakra imports
 import {
@@ -17,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 
 // Custom components
+import { logout } from "../slices/auth";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 
 // Icons
@@ -25,10 +28,15 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 export default function Navbar(props) {
   const { routeName } = props;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleLogout = (values, actions) => {
+  const { user: currentUser } = useSelector((state) => state.auth);
+
+  const handleLogout = useCallback(async () => {
+    await dispatch(logout());
+    navigate(0);
     navigate("/login");
-  };
+  }, [dispatch]);
 
   return (
     <Flex
@@ -65,7 +73,7 @@ export default function Navbar(props) {
             leftIcon={
               <Avatar
                 size={"sm"}
-                name={"Peter Parker"}
+                name={`${currentUser?.first_name} ${currentUser?.last_name}`}
                 src={"https://bit.ly/kent-c-dodds"}
                 mr={1}
               />
@@ -76,11 +84,11 @@ export default function Navbar(props) {
           >
             <Flex flexDirection={"column"} alignItems={"start"} mr={1}>
               <Text fontSize={"sm"} fontWeight={"semibold"} mb={0.5}>
-                Peter Parker
+                {currentUser?.first_name} {currentUser?.last_name}
               </Text>
               <Flex>
                 <Text fontSize={"xs"} fontWeight={"medium"} color={"gray.500"}>
-                  Staff
+                  {currentUser?.access_rights}
                 </Text>
               </Flex>
             </Flex>
