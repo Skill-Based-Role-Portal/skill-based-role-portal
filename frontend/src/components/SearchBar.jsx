@@ -34,17 +34,18 @@ export default function SearchBar({ onSearchChange }) {
       <Input
         value={value}
         onChange={handleChange}
-        variant={"filled"}
+        variant={"outline"}
         size={"md"}
         fontSize={"sm"}
         placeholder={"Search..."}
-        backgroundColor={"gray.200"}
+        backgroundColor={"gray.50"}
         _dark={{
           backgroundColor: "gray.700",
           _placeholder: { color: "gray.400" },
         }}
         focusBorderColor={"pink.300"}
         _placeholder={{ opacity: 0.7, color: "gray.500" }}
+        borderRadius={"md"}
       />
       {value && (
         <InputRightElement

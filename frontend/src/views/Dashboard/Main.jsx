@@ -17,25 +17,97 @@ export default function Main() {
   const numberOfSkeletons = 3;
   const skeletons = [];
 
+  const [refresh, setRefresh] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isPreviewLoading, setIsPreviewLoading] = useState(true);
   const [roles, setRoles] = useState([]);
+  const [searchedRoles, setSearchedRoles] = useState([]);
   const [filteredRoles, setFilteredRoles] = useState([]);
   const [previewRole, setPreviewRole] = useState({});
+  const [sortOption, setSortOption] = useState("Default");
+  const [searchTimeout, setSearchTimeout] = useState(null);
+
+  const refreshData = () => {
+    setRefresh(refresh + 1);
+  };
 
   useEffect(() => {
     fetchActiveRoles();
   }, []);
 
   const handleSearchChange = (value) => {
-    const newFilteredRoles = roles.filter((role) =>
-      Object.values(role).some((field) =>
-        String(field).toLowerCase().includes(value.toLowerCase())
-      )
-    );
+    setIsLoading(true);
+    setIsPreviewLoading(true);
 
-    setFilteredRoles(newFilteredRoles);
-    fetchRoleById(newFilteredRoles[0]?.role_id);
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    const newTimeout = setTimeout(() => {
+      const newSearchedRoles = roles.filter((role) =>
+        Object.values(role).some((field) =>
+          String(field).toLowerCase().includes(value.toLowerCase())
+        )
+      );
+
+      const combinedResults = applySort(newSearchedRoles, sortOption);
+
+      setSearchedRoles(newSearchedRoles);
+      setFilteredRoles(combinedResults);
+      fetchRoleById(combinedResults[0]?.role_id);
+
+      setIsLoading(false);
+      setIsPreviewLoading(false);
+    }, 600);
+
+    setSearchTimeout(newTimeout);
+  };
+
+  const handleSortChange = (value) => {
+    setIsLoading(true);
+    setIsPreviewLoading(true);
+
+    const sortedRoles = applySort(searchedRoles, value);
+
+    setSortOption(value);
+    setFilteredRoles(sortedRoles);
+    fetchRoleById(sortedRoles[0]?.role_id);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsPreviewLoading(false);
+    }, 600);
+  };
+
+  const applySort = (rolesToSort, sortOption) => {
+    switch (sortOption) {
+      case "Default":
+        return [...rolesToSort];
+      case "Recommended":
+        return [...rolesToSort].sort((a, b) => a.name.localeCompare(b.name));
+      case "Name (Ascending)":
+        return [...rolesToSort].sort((a, b) => a.name.localeCompare(b.name));
+      case "Name (Descending)":
+        return [...rolesToSort].sort((a, b) => b.name.localeCompare(a.name));
+      case "Created (Latest)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(b.created) - new Date(a.created)
+        );
+      case "Created (Earliest)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(a.created) - new Date(b.created)
+        );
+      case "Deadline (Latest)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(b.deadline) - new Date(a.deadline)
+        );
+      case "Deadline (Earliest)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(a.deadline) - new Date(b.deadline)
+        );
+      default:
+        return [...rolesToSort];
+    }
   };
 
   const fetchActiveRoles = () => {
