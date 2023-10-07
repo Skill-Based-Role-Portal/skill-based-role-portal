@@ -141,5 +141,87 @@ def get_all_applicants_by_role_id(role_id):
     ), 404
 
 
+@app.route("/application", methods=["POST"])
+def create_application():
+    data = request.get_json()
+    application = Application(**data)
+
+    staff_result = invoke_http(
+        staff_URL + str(application.staff_id), method='GET')
+
+    if staff_result["code"] in range(500, 600):
+        return jsonify(
+            {
+                "code": 500,
+                "message": "Oops, something went wrong!"
+            }
+        ), 500
+
+    if staff_result["code"] in range(300, 500):
+        return jsonify(
+            {
+                "code": 400,
+                "data": {
+                    "staff_id": application.staff_id
+                },
+                "message": "Staff does not exist."
+            }
+        ), 400
+
+    role_result = invoke_http(
+        role_URL + str(application.role_id), method='GET')
+
+    if role_result["code"] in range(500, 600):
+        return jsonify(
+            {
+                "code": 500,
+                "message": "Oops, something went wrong!"
+            }
+        ), 500
+
+    if role_result["code"] in range(300, 500):
+        return jsonify(
+            {
+                "code": 400,
+                "data": {
+                    "role_id": application.role_id
+                },
+                "message": "Role does not exist."
+            }
+        ), 400
+
+    existing_application = Application.query.filter_by(
+        staff_id=application.staff_id, role_id=application.role_id).first()
+
+    if (existing_application):
+        return jsonify(
+            {
+                "code": 400,
+                "data": {
+                    "application_id": existing_application.application_id
+                },
+                "message": "Role Application already exists."
+            }
+        ), 400
+
+    try:
+        db.session.add(application)
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred creating the application."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "code": 201,
+            "data": application.json()
+        }
+    ), 201
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)
