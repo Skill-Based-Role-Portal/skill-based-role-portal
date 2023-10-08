@@ -1,13 +1,23 @@
 // General imports
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import RoleService from "../../services/role.service";
+import ApplicationService from "../../services/application.service";
 
 // Chakra imports
-import { Flex, Grid, GridItem, Heading, VStack, Tag, Skeleton } from "@chakra-ui/react";
+import {
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  VStack,
+  Tag,
+  Skeleton,
+} from "@chakra-ui/react";
 
 // Custom components
-import SearchBar from "../../components/SearchBar"
-import SortBar from "../../components/SortBar"
+import SearchBar from "../../components/SearchBar";
+import SortBar from "../../components/SortBar";
 import RoleListing from "../../components/RoleListing";
 import PreviewRoleListing from "../../components/PreviewRoleListing";
 import RoleListingSkeleton from "../../components/skeletons/RoleListingSkeleton";
@@ -28,6 +38,11 @@ export default function Main() {
   const [sortOption, setSortOption] = useState("Default");
   const [searchTimeout, setSearchTimeout] = useState(null);
 
+  const [roleApplications, setRoleApplications] = useState([]);
+  const [roleApplicationIds, setRoleApplicationIds] = useState([]);
+
+  const { user: currentUser } = useSelector((state) => state.auth);
+
   const refreshData = () => {
     setRefresh(refresh + 1);
   };
@@ -35,6 +50,12 @@ export default function Main() {
   useEffect(() => {
     fetchActiveRoles();
   }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchApplicationsByStaffId(currentUser?.staff_id);
+    }
+  }, [refresh]);
 
   const handleSearchChange = (value) => {
     setIsLoading(true);
@@ -106,44 +127,50 @@ export default function Main() {
         return [...rolesToSort].sort(
           (a, b) => new Date(b.deadline) - new Date(a.deadline)
         );
+
       default:
         return [...rolesToSort];
     }
   };
 
   const fetchActiveRoles = () => {
-    RoleService.getActiveRoles().then(
-      (response) => {
-        const rolesData = response.data.data.roles;
-        setRoles(rolesData);
-        setSearchedRoles(rolesData);
-        setFilteredRoles(rolesData);
-        fetchRoleById(rolesData[0]?.role_id);
-      },
-      (error) => {
-        setRoles([]);
-      }).finally(
+    RoleService.getActiveRoles()
+      .then(
+        (response) => {
+          const rolesData = response.data.data.roles;
+          setRoles(rolesData);
+          setSearchedRoles(rolesData);
+          setFilteredRoles(rolesData);
+          fetchRoleById(rolesData[0]?.role_id);
+        },
+        (error) => {
+          setRoles([]);
+        }
+      )
+      .finally(
         setTimeout(() => {
           setIsLoading(false);
           setIsPreviewLoading(false);
         }, 600)
-      )
+      );
   };
 
   const fetchRoleById = (roleId) => {
-    RoleService.getRoleById(roleId).then(
-      (response) => {
-        setPreviewRole(response.data.data);
-      },
-      (error) => {
-        setPreviewRole([]);
-      }
-    ).finally(
-      setTimeout(() => {
-        setIsLoading(false);
-        setIsPreviewLoading(false);
-      }, 600)
-    );
+    RoleService.getRoleById(roleId)
+      .then(
+        (response) => {
+          setPreviewRole(response.data.data);
+        },
+        (error) => {
+          setPreviewRole({});
+        }
+      )
+      .finally(
+        setTimeout(() => {
+          setIsLoading(false);
+          setIsPreviewLoading(false);
+        }, 600)
+      );
   };
 
   for (let i = 0; i < numberOfSkeletons; i++) {
@@ -156,6 +183,23 @@ export default function Main() {
     setTimeout(() => {
       setIsPreviewLoading(false);
     }, 600);
+  };
+
+  const fetchApplicationsByStaffId = (staffId) => {
+    ApplicationService.getApplicationByStaffId(staffId).then(
+      (response) => {
+        const applicationsData = response.data.data.applications;
+        const roleApplicationIds = applicationsData.map(
+          (application) => application.role_id
+        );
+        setRoleApplications(applicationsData);
+        setRoleApplicationIds(roleApplicationIds);
+      },
+      (error) => {
+        setRoleApplications([]);
+        setRoleApplicationIds([]);
+      }
+    );
   };
 
   return (
@@ -172,20 +216,21 @@ export default function Main() {
       </Flex>
       <Flex flexDirection={"column"} h={"full"}>
         <Heading
-            py={2}
-            px={3}
-            mb={1}
-            fontSize={"lg"}
-            fontWeight={"semibold"}
-            color={"gray.600"}
-            _dark={{ color: "gray.400" }}
-          >
-            {isLoading ? (
-              <Skeleton h={"22px"} w={"180px"} />
-            ) : (
-              `Available Roles (${filteredRoles.length})`
-            )}
-          </Heading>
+          py={2}
+          px={3}
+          mb={1}
+          fontSize={"lg"}
+          fontWeight={"semibold"}
+          color={"gray.600"}
+          _dark={{ color: "gray.400" }}
+        >
+          {isLoading ? (
+            <Skeleton h={"22px"} w={"180px"} />
+          ) : (
+            `Available Roles (${filteredRoles.length})`
+          )}
+        </Heading>
+
         <Grid
           templateColumns={"repeat(12, 1fr)"}
           gap={4}
@@ -210,6 +255,7 @@ export default function Main() {
                   <RoleListing
                     key={role.role_id}
                     role={role}
+                    roleApplicationIds={roleApplicationIds}
                     clickedId={handleRoleClick}
                   />
                 ))
@@ -222,7 +268,12 @@ export default function Main() {
             ) : filteredRoles.length === 0 ? (
               <></>
             ) : (
-              <PreviewRoleListing previewRole={previewRole} />
+              <PreviewRoleListing
+                previewRole={previewRole}
+                roleApplicationIds={roleApplicationIds}
+                staffId={currentUser?.staff_id}
+                refresh={refreshData}
+              />
             )}
           </GridItem>
         </Grid>

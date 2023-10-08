@@ -1,5 +1,6 @@
 // General imports
-import { useRef } from "react";
+import { useState, useRef } from "react";
+import ApplicationService from "../services/application.service";
 
 // Chakra imports
 import {
@@ -18,6 +19,7 @@ import {
   VStack,
   HStack,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 
 // Custom components
@@ -36,7 +38,7 @@ import {
 } from "react-icons/bi";
 
 export default function PreviewRoleListing(props) {
-  const { previewRole } = props;
+  const { previewRole, roleApplicationIds, staffId, refresh } = props;
 
   const modalSize = "6xl";
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -44,6 +46,42 @@ export default function PreviewRoleListing(props) {
   const initialRef = useRef(null);
   const finalRef = useRef(null);
   const scrollBehavior = "inside";
+
+  const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const applicationStatus = roleApplicationIds.includes(previewRole.role_id);
+
+  const createRoleListing = () => {
+    const payload = {
+      staff_id: staffId,
+      role_id: previewRole.role_id,
+      status: "Applied",
+    };
+
+    ApplicationService.createApplication(payload).then(
+      (response) => {
+        setIsLoading(false);
+        refresh();
+        toast({
+          position: "top",
+          status: "success",
+          isClosable: true,
+          title: "Role Applied",
+          description: `${previewRole.name} Role has been applied successfully.`,
+        });
+      },
+      (error) => {
+        setIsLoading(false);
+        toast({
+          position: "top",
+          status: "error",
+          isClosable: true,
+          title: "Error Occured",
+          description: error.response.data.message,
+        });
+      }
+    );
+  };
 
   return (
     <Flex h={"full"}>
@@ -92,8 +130,11 @@ export default function PreviewRoleListing(props) {
                   size={"md"}
                   fontSize={"sm"}
                   mr={2.5}
+                  isDisabled={applicationStatus}
+                  isLoading={isLoading}
+                  onClick={createRoleListing}
                 >
-                  Apply
+                  {applicationStatus ? "Applied" : "Apply"}
                 </Button>
                 <IconButton
                   variant={"outline"}
@@ -105,7 +146,7 @@ export default function PreviewRoleListing(props) {
                 />
                 <IconButton
                   variant={"outline"}
-                  aria-label="Bookmark role listing"
+                  aria-label="Preview role listing"
                   size={"md"}
                   icon={<BiExpandAlt />}
                   color={"gray.500"}
@@ -257,6 +298,9 @@ export default function PreviewRoleListing(props) {
         finalRef={finalRef}
         scrollBehavior={scrollBehavior}
         modalSize={modalSize}
+        staffId={staffId}
+        applicationStatus={applicationStatus}
+        refresh={refresh}
       />
     </Flex>
   );

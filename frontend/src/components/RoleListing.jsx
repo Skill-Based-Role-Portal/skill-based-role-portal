@@ -1,6 +1,7 @@
 // Chakra imports
 import {
   Box,
+  Button,
   Flex,
   Text,
   Card,
@@ -20,7 +21,9 @@ import TimeAgo from "../helper/TimeAgo";
 import { BiBookmark, BiBriefcase, BiMap, BiTimeFive } from "react-icons/bi";
 
 export default function RoleListing(props) {
-  const { role, clickedId } = props;
+  const { role, roleApplicationIds, clickedId } = props;
+
+  const applicationStatus = roleApplicationIds.includes(role.role_id);
 
   const handleClick = () => {
     clickedId(role.role_id);
@@ -59,13 +62,27 @@ export default function RoleListing(props) {
                 </Text>
               </Flex>
             </Box>
-            <IconButton
-              variant={"outline"}
-              aria-label="Bookmark role listing"
-              size={"sm"}
-              icon={<BiBookmark />}
-              color={"gray.500"}
-            />
+            <Flex alignItems={"start"}>
+              {applicationStatus && (
+                <Tag
+                  colorScheme={"whatsapp"}
+                  size={"sm"}
+                  fontSize={"xs"}
+                  lineHeight={"1"}
+                  py={2.5}
+                  mr={2}
+                >
+                  Applied
+                </Tag>
+              )}
+              <IconButton
+                variant={"outline"}
+                aria-label="Bookmark role listing"
+                size={"sm"}
+                icon={<BiBookmark />}
+                color={"gray.500"}
+              />
+            </Flex>
           </Flex>
           <Flex justifyContent={"space-between"} alignItems={"center"}>
             <Flex>
