@@ -1,5 +1,6 @@
 // General imports
-import SimpleDate from "../helper/SimpleDate";
+import { useState } from "react";
+import ApplicationService from "../services/application.service";
 
 // Chakra imports
 import {
@@ -21,7 +22,11 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
+  useToast,
 } from "@chakra-ui/react";
+
+// Helpers
+import SimpleDate from "../helper/SimpleDate";
 
 // Icons
 import {
@@ -41,7 +46,45 @@ export default function PreviewRoleListing(props) {
     finalRef,
     scrollBehavior,
     modalSize,
+    staffId,
+    applicationStatus,
+    refresh,
   } = props;
+
+  const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const createRoleListing = () => {
+    const payload = {
+      staff_id: staffId,
+      role_id: previewRole.role_id,
+      status: "Applied",
+    };
+
+    ApplicationService.createApplication(payload).then(
+      (response) => {
+        setIsLoading(false);
+        refresh();
+        toast({
+          position: "top",
+          status: "success",
+          isClosable: true,
+          title: "Role Applied",
+          description: `${previewRole.name} Role has been applied successfully.`,
+        });
+      },
+      (error) => {
+        setIsLoading(false);
+        toast({
+          position: "top",
+          status: "error",
+          isClosable: true,
+          title: "Error Occured",
+          description: error.response.data.message,
+        });
+      }
+    );
+  };
 
   return (
     <Modal
@@ -91,8 +134,11 @@ export default function PreviewRoleListing(props) {
                 fontSize={"md"}
                 px={4}
                 mr={2.5}
+                isDisabled={applicationStatus}
+                isLoading={isLoading}
+                onClick={createRoleListing}
               >
-                Apply
+                {applicationStatus ? "Applied" : "Apply"}
               </Button>
               <IconButton
                 variant={"outline"}
