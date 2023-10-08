@@ -3,17 +3,18 @@ import { useState, useEffect } from "react";
 import RoleService from "../../services/role.service";
 
 // Chakra imports
-import { Grid, GridItem, Flex, VStack, Tag } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Heading, VStack, Tag, Skeleton } from "@chakra-ui/react";
 
 // Custom components
 import SearchBar from "../../components/SearchBar"
+import SortBar from "../../components/SortBar"
 import RoleListing from "../../components/RoleListing";
 import PreviewRoleListing from "../../components/PreviewRoleListing";
 import RoleListingSkeleton from "../../components/skeletons/RoleListingSkeleton";
 import PreviewRoleListingSkeleton from "../../components/skeletons/PreviewRoleListingSkeleton";
 
 export default function Main() {
-  const calculatedMaxHeight = `calc(100vh - 80px - 4rem - 4rem)`;
+  const calculatedMaxHeight = `calc(100vh - 80px - 4rem - 1.5rem)`;
   const numberOfSkeletons = 3;
   const skeletons = [];
 
@@ -89,21 +90,21 @@ export default function Main() {
         return [...rolesToSort].sort((a, b) => a.name.localeCompare(b.name));
       case "Name (Descending)":
         return [...rolesToSort].sort((a, b) => b.name.localeCompare(a.name));
-      case "Created (Latest)":
+      case "Created (Most Recent)":
         return [...rolesToSort].sort(
           (a, b) => new Date(b.created) - new Date(a.created)
         );
-      case "Created (Earliest)":
+      case "Created (Oldest)":
         return [...rolesToSort].sort(
           (a, b) => new Date(a.created) - new Date(b.created)
         );
-      case "Deadline (Latest)":
-        return [...rolesToSort].sort(
-          (a, b) => new Date(b.deadline) - new Date(a.deadline)
-        );
-      case "Deadline (Earliest)":
+      case "Deadline (Most Recent)":
         return [...rolesToSort].sort(
           (a, b) => new Date(a.deadline) - new Date(b.deadline)
+        );
+      case "Deadline (Oldest)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(b.deadline) - new Date(a.deadline)
         );
       default:
         return [...rolesToSort];
@@ -115,6 +116,7 @@ export default function Main() {
       (response) => {
         const rolesData = response.data.data.roles;
         setRoles(rolesData);
+        setSearchedRoles(rolesData);
         setFilteredRoles(rolesData);
         fetchRoleById(rolesData[0]?.role_id);
       },
@@ -157,11 +159,33 @@ export default function Main() {
   };
 
   return (
-    <Flex px={5} py={8} flexDirection={"column"} h={"full"}>
-      <Flex mb={4}>
-        <SearchBar onSearchChange={handleSearchChange} />
+    <Flex px={5} py={6} flexDirection={"column"} h={"full"}>
+      <Flex mb={3}>
+        <Grid templateColumns="repeat(12, 1fr)" gap={3} w={"full"}>
+          <GridItem colSpan={"11"}>
+            <SearchBar onSearchChange={handleSearchChange} />
+          </GridItem>
+          <GridItem colSpan={"auto"}>
+            <SortBar onSortChange={handleSortChange} />
+          </GridItem>
+        </Grid>
       </Flex>
       <Flex flexDirection={"column"} h={"full"}>
+        <Heading
+            py={2}
+            px={3}
+            mb={1}
+            fontSize={"lg"}
+            fontWeight={"semibold"}
+            color={"gray.600"}
+            _dark={{ color: "gray.400" }}
+          >
+            {isLoading ? (
+              <Skeleton h={"22px"} w={"180px"} />
+            ) : (
+              `Available Roles (${filteredRoles.length})`
+            )}
+          </Heading>
         <Grid
           templateColumns={"repeat(12, 1fr)"}
           gap={4}
