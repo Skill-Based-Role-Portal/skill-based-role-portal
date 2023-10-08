@@ -3,39 +3,112 @@ import { useState, useEffect } from "react";
 import RoleService from "../../services/role.service";
 
 // Chakra imports
-import { Grid, GridItem, Flex, VStack, Tag } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Heading, VStack, Tag, Skeleton } from "@chakra-ui/react";
 
 // Custom components
 import SearchBar from "../../components/SearchBar"
+import SortBar from "../../components/SortBar"
 import RoleListing from "../../components/RoleListing";
 import PreviewRoleListing from "../../components/PreviewRoleListing";
 import RoleListingSkeleton from "../../components/skeletons/RoleListingSkeleton";
 import PreviewRoleListingSkeleton from "../../components/skeletons/PreviewRoleListingSkeleton";
 
 export default function Main() {
-  const calculatedMaxHeight = `calc(100vh - 80px - 4rem - 4rem)`;
+  const calculatedMaxHeight = `calc(100vh - 80px - 4rem - 1.5rem)`;
   const numberOfSkeletons = 3;
   const skeletons = [];
 
+  const [refresh, setRefresh] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isPreviewLoading, setIsPreviewLoading] = useState(true);
   const [roles, setRoles] = useState([]);
+  const [searchedRoles, setSearchedRoles] = useState([]);
   const [filteredRoles, setFilteredRoles] = useState([]);
   const [previewRole, setPreviewRole] = useState({});
+  const [sortOption, setSortOption] = useState("Default");
+  const [searchTimeout, setSearchTimeout] = useState(null);
+
+  const refreshData = () => {
+    setRefresh(refresh + 1);
+  };
 
   useEffect(() => {
     fetchActiveRoles();
   }, []);
 
   const handleSearchChange = (value) => {
-    const newFilteredRoles = roles.filter((role) =>
-      Object.values(role).some((field) =>
-        String(field).toLowerCase().includes(value.toLowerCase())
-      )
-    );
+    setIsLoading(true);
+    setIsPreviewLoading(true);
 
-    setFilteredRoles(newFilteredRoles);
-    fetchRoleById(newFilteredRoles[0]?.role_id);
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    const newTimeout = setTimeout(() => {
+      const newSearchedRoles = roles.filter((role) =>
+        Object.values(role).some((field) =>
+          String(field).toLowerCase().includes(value.toLowerCase())
+        )
+      );
+
+      const combinedResults = applySort(newSearchedRoles, sortOption);
+
+      setSearchedRoles(newSearchedRoles);
+      setFilteredRoles(combinedResults);
+      fetchRoleById(combinedResults[0]?.role_id);
+
+      setIsLoading(false);
+      setIsPreviewLoading(false);
+    }, 600);
+
+    setSearchTimeout(newTimeout);
+  };
+
+  const handleSortChange = (value) => {
+    setIsLoading(true);
+    setIsPreviewLoading(true);
+
+    const sortedRoles = applySort(searchedRoles, value);
+
+    setSortOption(value);
+    setFilteredRoles(sortedRoles);
+    fetchRoleById(sortedRoles[0]?.role_id);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsPreviewLoading(false);
+    }, 600);
+  };
+
+  const applySort = (rolesToSort, sortOption) => {
+    switch (sortOption) {
+      case "Default":
+        return [...rolesToSort];
+      case "Recommended":
+        return [...rolesToSort].sort((a, b) => a.name.localeCompare(b.name));
+      case "Name (Ascending)":
+        return [...rolesToSort].sort((a, b) => a.name.localeCompare(b.name));
+      case "Name (Descending)":
+        return [...rolesToSort].sort((a, b) => b.name.localeCompare(a.name));
+      case "Created (Most Recent)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(b.created) - new Date(a.created)
+        );
+      case "Created (Oldest)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(a.created) - new Date(b.created)
+        );
+      case "Deadline (Most Recent)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(a.deadline) - new Date(b.deadline)
+        );
+      case "Deadline (Oldest)":
+        return [...rolesToSort].sort(
+          (a, b) => new Date(b.deadline) - new Date(a.deadline)
+        );
+      default:
+        return [...rolesToSort];
+    }
   };
 
   const fetchActiveRoles = () => {
@@ -43,6 +116,7 @@ export default function Main() {
       (response) => {
         const rolesData = response.data.data.roles;
         setRoles(rolesData);
+        setSearchedRoles(rolesData);
         setFilteredRoles(rolesData);
         fetchRoleById(rolesData[0]?.role_id);
       },
@@ -85,11 +159,33 @@ export default function Main() {
   };
 
   return (
-    <Flex px={5} py={8} flexDirection={"column"} h={"full"}>
-      <Flex mb={4}>
-        <SearchBar onSearchChange={handleSearchChange} />
+    <Flex px={5} py={6} flexDirection={"column"} h={"full"}>
+      <Flex mb={3}>
+        <Grid templateColumns="repeat(12, 1fr)" gap={3} w={"full"}>
+          <GridItem colSpan={"11"}>
+            <SearchBar onSearchChange={handleSearchChange} />
+          </GridItem>
+          <GridItem colSpan={"auto"}>
+            <SortBar onSortChange={handleSortChange} />
+          </GridItem>
+        </Grid>
       </Flex>
       <Flex flexDirection={"column"} h={"full"}>
+        <Heading
+            py={2}
+            px={3}
+            mb={1}
+            fontSize={"lg"}
+            fontWeight={"semibold"}
+            color={"gray.600"}
+            _dark={{ color: "gray.400" }}
+          >
+            {isLoading ? (
+              <Skeleton h={"22px"} w={"180px"} />
+            ) : (
+              `Available Roles (${filteredRoles.length})`
+            )}
+          </Heading>
         <Grid
           templateColumns={"repeat(12, 1fr)"}
           gap={4}
