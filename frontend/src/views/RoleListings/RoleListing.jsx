@@ -25,6 +25,7 @@ import {
 // Custom components
 import DynamicTable from "../../components/DynamicTable";
 import ViewRoleListingSkeleton from "../../components/skeletons/ViewRoleListingSkeleton";
+import ViewApplicantModal from "./Components/ViewApplicantModal";
 
 // Helpers
 import SimpleDate from "../../helper/SimpleDate";
@@ -125,6 +126,16 @@ export default function RoleListing() {
       Cell: ({ row }) => (
         <Flex>
           <HStack spacing={2}>
+            <ViewApplicantModal
+              staffId={row.original.staff_id}
+              firstName={row.original.first_name}
+              lastName={row.original.last_name}
+              location={row.original.location}
+              department={row.original.department}
+              email={row.original.email}
+              skills={row.original.skills}
+            />
+
             <Button
               size={"sm"}
               fontSize={"xs"}
