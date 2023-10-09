@@ -6,10 +6,10 @@ from os import environ
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['JSON_SORT_KEYS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
+app.config["JSON_SORT_KEYS"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("dbURL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_recycle": 299}
 
 db = SQLAlchemy(app)
 
@@ -17,7 +17,7 @@ CORS(app)
 
 
 class Role(db.Model):
-    __tablename__ = 'roles'
+    __tablename__ = "roles"
 
     role_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False, unique=True)
@@ -33,7 +33,7 @@ class Role(db.Model):
     modified = db.Column(db.DateTime, nullable=False,
                          default=datetime.now, onupdate=datetime.now)
 
-    role_skills = db.relationship("Role_Skill", primaryjoin='Role.name == foreign(Role_Skill.role_name)', foreign_keys="[Role_Skill.role_name]", backref="role")
+    role_skills = db.relationship("Role_Skill", primaryjoin="Role.name == foreign(Role_Skill.role_name)", foreign_keys="[Role_Skill.role_name]", backref="role")
 
     def __init__(self, name, experience, location, department, employment_type, requirement, description, hiring_manager, deadline, skills):
         self.name = name
@@ -52,30 +52,30 @@ class Role(db.Model):
 
     def json(self):
         r = {
-            'role_id': self.role_id,
-            'name': self.name,
-            'experience': self.experience,
-            'location': self.location,
-            'department': self.department,
-            'employment_type': self.employment_type,
-            'requirement': self.requirement,
-            'description': self.description,
-            'hiring_manager': self.hiring_manager,
-            'deadline': self.deadline,
-            'status': "Active" if self.deadline.date() >= datetime.today().date() else "Expired",
-            'created': self.created,
-            'modified': self.modified
+            "role_id": self.role_id,
+            "name": self.name,
+            "experience": self.experience,
+            "location": self.location,
+            "department": self.department,
+            "employment_type": self.employment_type,
+            "requirement": self.requirement,
+            "description": self.description,
+            "hiring_manager": self.hiring_manager,
+            "deadline": self.deadline,
+            "status": "Active" if self.deadline.date() >= datetime.today().date() else "Expired",
+            "created": self.created,
+            "modified": self.modified
         }
 
-        r['skills'] = []
+        r["skills"] = []
         for skill in self.role_skills:
-            r['skills'].append(skill.json()["skill_name"])
+            r["skills"].append(skill.json()["skill_name"])
 
         return r
 
 
 class Role_Skill(db.Model):
-    __tablename__ = 'role_skills'
+    __tablename__ = "role_skills"
 
     role_name = db.Column(db.String(20), primary_key=True)
     skill_name = db.Column(db.String(20), primary_key=True)
@@ -85,7 +85,7 @@ class Role_Skill(db.Model):
         self.skill_name = skill_name
 
     def json(self):
-        return {'role_name': self.role_name, 'skill_name': self.skill_name}
+        return {"role_name": self.role_name, "skill_name": self.skill_name}
 
 
 with app.app_context():
@@ -165,7 +165,7 @@ def find_by_role_id(role_id):
     ), 404
 
 
-@app.route("/role", methods=['POST'])
+@app.route("/role", methods=["POST"])
 def create_role():
     data = request.get_json()
     role = Role(**data)
@@ -200,20 +200,20 @@ def create_role():
     ), 201
 
 
-@app.route("/role/<role_id>", methods=['PUT'])
+@app.route("/role/<role_id>", methods=["PUT"])
 def update_role(role_id):
     role = Role.query.filter_by(role_id=role_id).first()
 
     if role:
         data = request.get_json()
 
-        if data['name']:
-            if (Role.query.filter_by(name=data['name']).filter(Role.role_id != role_id).first()):
+        if data["name"]:
+            if (Role.query.filter_by(name=data["name"]).filter(Role.role_id != role_id).first()):
                 return jsonify(
                     {
                         "code": 400,
                         "data": {
-                            "name": data['name']
+                            "name": data["name"]
                         },
                         "message": "Role already exists."
                     }
@@ -221,30 +221,30 @@ def update_role(role_id):
 
             for skill in role.role_skills:
                 db.session.delete(skill)
-            role.name = data['name']
+            role.name = data["name"]
 
-        if data['experience']:
-            role.experience = data['experience']
-        if data['location']:
-            role.location = data['location']
-        if data['department']:
-            role.department = data['department']
-        if data['employment_type']:
-            role.employment_type = data['employment_type']
-        if data['requirement']:
-            role.requirement = data['requirement']
-        if data['description']:
-            role.description = data['description']
-        if data['hiring_manager']:
-            role.hiring_manager = data['hiring_manager']
-        if data['deadline']:
-            role.deadline = data['deadline']
+        if data["experience"]:
+            role.experience = data["experience"]
+        if data["location"]:
+            role.location = data["location"]
+        if data["department"]:
+            role.department = data["department"]
+        if data["employment_type"]:
+            role.employment_type = data["employment_type"]
+        if data["requirement"]:
+            role.requirement = data["requirement"]
+        if data["description"]:
+            role.description = data["description"]
+        if data["hiring_manager"]:
+            role.hiring_manager = data["hiring_manager"]
+        if data["deadline"]:
+            role.deadline = data["deadline"]
 
-        if 'skills' in data:
+        if "skills" in data:
             for skill in role.role_skills:
                 db.session.delete(skill)
 
-            for skill_name in data['skills']:
+            for skill_name in data["skills"]:
                 role_skill = Role_Skill(
                     role_name=role.name, skill_name=skill_name)
                 db.session.add(role_skill)
@@ -267,5 +267,5 @@ def update_role(role_id):
         }
     ), 404
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5003, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5003, debug=True)

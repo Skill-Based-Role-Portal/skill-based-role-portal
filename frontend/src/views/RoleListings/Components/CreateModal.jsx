@@ -255,15 +255,25 @@ export default function CreateModal({ refresh }) {
                             <FormLabel fontSize={"sm"}>
                               Experience Level
                             </FormLabel>
-                            <Input
-                              type="text"
-                              placeholder="Enter Experience Level"
+                            <Select
+                              placeholder="Select Experience Level"
                               fontSize={"sm"}
-                              maxLength={"50"}
                               focusBorderColor={"pink.300"}
                               variant="filled"
                               {...field}
-                            />
+                            >
+                              <option value={"Entry Level"}>Entry Level</option>
+                              <option value={"Junior Level"}>
+                                Junior Level
+                              </option>
+                              <option value={"Mid Level"}>Mid Level</option>
+                              <option value={"Senior Level"}>
+                                Senior Level
+                              </option>
+                              <option value={"Director Level"}>
+                                Director Level
+                              </option>
+                            </Select>
                             <FormErrorMessage name="experience">
                               {errors.experience}
                             </FormErrorMessage>
@@ -326,15 +336,16 @@ export default function CreateModal({ refresh }) {
                           }
                         >
                           <FormLabel fontSize={"sm"}>Employment Type</FormLabel>
-                          <Input
-                            type="text"
-                            placeholder="Enter Employment Type"
+                          <Select
+                            placeholder="Select Employment Type"
                             fontSize={"sm"}
-                            maxLength={"50"}
                             focusBorderColor={"pink.300"}
                             variant="filled"
                             {...field}
-                          />
+                          >
+                            <option value={"Full Time"}>Full Time</option>
+                            <option value={"Part Time"}>Part Time</option>
+                          </Select>
                           <FormErrorMessage name="employment_type">
                             {errors.employment_type}
                           </FormErrorMessage>

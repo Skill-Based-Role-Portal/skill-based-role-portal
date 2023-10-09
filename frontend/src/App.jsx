@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import Main from "./views/Dashboard/Main";
 import RoleListingsPage from "./views/RoleListings/RoleListings";
+import RoleListingPage from "./views/RoleListings/RoleListing";
 import Login from "./views/Auth/Login";
 
 function App() {
@@ -23,6 +24,10 @@ function App() {
         isHumanResource && {
           path: "role-listings",
           element: <RoleListingsPage name={"Role Listings"} />,
+        },
+        isHumanResource && {
+          path: "role-listing/:roleId",
+          element: <RoleListingPage name={"Role Listing"} />,
         },
       ],
     },
