@@ -1,7 +1,7 @@
 // Chakra imports
 import { Flex, Card, CardBody, Skeleton, SkeletonText } from "@chakra-ui/react";
 
-export default function RoleListingSkeleton() {
+export default function RoleListingsTableSkeleton() {
   return (
     <Flex w={"full"}>
       <Card

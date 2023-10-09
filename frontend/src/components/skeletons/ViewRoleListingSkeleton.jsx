@@ -10,11 +10,11 @@ import {
   SkeletonText,
 } from "@chakra-ui/react";
 
-export default function PreviewRoleListingSkeleton() {
+export default function ViewRoleListingSkeleton() {
   return (
     <Flex h={"full"}>
       <Card
-        p={0.5}
+        p={2.5}
         w={"full"}
         variant={"outline"}
         backgroundColor={"gray.50"}
@@ -28,17 +28,21 @@ export default function PreviewRoleListingSkeleton() {
           justifyContent={"space-between"}
         >
           <Flex flexDirection={"column"}>
+            <Flex justifyContent={"space-between"} alignItems={"center"} mb={6}>
+              <Flex>
+                <Skeleton h={"28px"} w={"180px"} />
+              </Flex>
+
+              <Flex>
+                <Skeleton h={"34px"} w={"120px"} />
+              </Flex>
+            </Flex>
             <Flex justifyContent={"space-between"} mb={4}>
               <Box>
                 <Skeleton h={"22px"} w={"180px"} mb={2} />
                 <Skeleton h={"28px"} w={"250px"} mb={2.5} />
                 <Skeleton h={"20px"} w={"120px"} />
               </Box>
-              <Flex>
-                <Skeleton h={"40px"} w={"70px"} mr={2.5} />
-                <Skeleton h={"40px"} w={"40px"} mr={2.5} />
-                <Skeleton h={"40px"} w={"40px"} />
-              </Flex>
             </Flex>
             <Flex
               mb={10}
@@ -57,7 +61,7 @@ export default function PreviewRoleListingSkeleton() {
               <Flex flexDirection="column" w="full">
                 <Skeleton h={"18px"} w={"150px"} mb={2} />
                 <SkeletonText
-                  noOfLines={3}
+                  noOfLines={2}
                   spacing="2"
                   skeletonHeight="4"
                   w={"full"}
@@ -66,7 +70,7 @@ export default function PreviewRoleListingSkeleton() {
               <Flex flexDirection="column" w="full">
                 <Skeleton h={"18px"} w={"150px"} mb={2} />
                 <SkeletonText
-                  noOfLines={3}
+                  noOfLines={2}
                   spacing="2"
                   skeletonHeight="4"
                   w={"full"}

@@ -1,5 +1,5 @@
 // General imports
-import { useMemo } from "react";
+import { useMemo, forwardRef } from "react";
 
 // Chakra imports
 import {
@@ -43,7 +43,7 @@ import {
 } from "react-icons/ti";
 
 export default function DynamicTable(props) {
-  const { title, createItem, columnsData, tableData } = props;
+  const { innerRef, title, createItem, columnsData, tableData } = props;
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
@@ -89,6 +89,7 @@ export default function DynamicTable(props) {
 
   return (
     <Card
+      ref={innerRef}
       variant={"outline"}
       backgroundColor={"gray.50"}
       _dark={{ backgroundColor: "gray.800" }}
