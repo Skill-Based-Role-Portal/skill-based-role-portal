@@ -73,7 +73,7 @@ export default function PreviewRoleListingSkeleton() {
                 />
               </Flex>
               <Flex flexDirection="column">
-                <Skeleton h={"18px"} w={"45px"} mb={2} />
+                <Skeleton h={"18px"} w={"100px"} mb={2} />
                 <HStack spacing={2.5}>
                   <Skeleton h={"20px"} w={"60px"} />
                   <Skeleton h={"20px"} w={"60px"} />

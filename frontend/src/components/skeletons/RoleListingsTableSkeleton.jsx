@@ -11,7 +11,7 @@ export default function RoleListingsTableSkeleton() {
         _dark={{ backgroundColor: "gray.800" }}
       >
         <CardBody color={"gray.700"} _dark={{ color: "gray.400" }}>
-          <Flex justifyContent={"space-between"} mt={1} mb={10}>
+          <Flex justifyContent={"space-between"} mt={1} mb={8}>
             <Skeleton h={"26px"} w={"160px"} />
             <Skeleton h={"35px"} w={"140px"} />
           </Flex>
@@ -20,7 +20,7 @@ export default function RoleListingsTableSkeleton() {
               <Skeleton h={"20px"} w={"175px"} />
             </Flex>
             <Flex>
-              <Skeleton h={"24px"} w={"150px"} />
+              <Skeleton h={"30px"} w={"200px"} />
             </Flex>
           </Flex>
           <Flex flexDirection={"column"} mb={2}>

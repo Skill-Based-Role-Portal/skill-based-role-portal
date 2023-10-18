@@ -24,7 +24,7 @@ import RoleListingSkeleton from "../../components/skeletons/RoleListingSkeleton"
 import PreviewRoleListingSkeleton from "../../components/skeletons/PreviewRoleListingSkeleton";
 
 export default function Main() {
-  const calculatedMaxHeight = `calc(100vh - 80px - 4rem - 1.5rem)`;
+  const calculatedMaxHeight = `calc(100vh + 30vh)`;
   const numberOfSkeletons = 3;
   const skeletons = [];
 
