@@ -20,13 +20,13 @@ class Role(db.Model):
     __tablename__ = "roles"
 
     role_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False, unique=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
     experience = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(50), nullable=False)
     department = db.Column(db.String(50), nullable=False)
     employment_type = db.Column(db.String(50), nullable=False)
     requirement = db.Column(db.String(256), nullable=False)
-    description = db.Column(db.String(256), nullable=False)
+    description = db.Column(db.String(10000), nullable=False)
     hiring_manager = db.Column(db.String(256), nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
@@ -86,23 +86,6 @@ class Role_Skill(db.Model):
 
     def json(self):
         return {"role_name": self.role_name, "skill_name": self.skill_name}
-
-
-with app.app_context():
-    db.create_all()
-
-    existing_role_1 = db.session.query(Role).filter(
-        Role.name == "Software Engineer").first()
-    if not existing_role_1:
-        new_role_1 = Role(name="Software Engineer", experience="Entry Level", location="Singapore", department="Information Technology", employment_type="Full Time",
-                          requirement="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo", description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida quis blandit turpis cursus in hac.", hiring_manager="Tony Stark", deadline="2023-12-31", skills=["HTML", "CSS", "JavaScript"])
-        new_role_2 = Role(name="Marketing Associate", experience="Entry Level", location="Singapore", department="Marketing", employment_type="Full Time",
-                          requirement="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo", description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida quis blandit turpis cursus in hac.", hiring_manager="Tony Stark", deadline="2023-12-31", skills=["Graphic Design"])
-        new_role_3 = Role(name="Sales Associate", experience="Entry Level", location="Singapore", department="Sales", employment_type="Full Time",
-                          requirement="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo", description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Gravida quis blandit turpis cursus in hac.", hiring_manager="Tony Stark", deadline="2023-12-31", skills=[])
-
-        db.session.add_all([new_role_1, new_role_2, new_role_3])
-        db.session.commit()
 
 
 @app.route("/role")

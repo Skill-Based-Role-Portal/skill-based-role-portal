@@ -74,7 +74,6 @@ export default function Navbar(props) {
               <Avatar
                 size={"sm"}
                 name={`${currentUser?.first_name} ${currentUser?.last_name}`}
-                src={"https://bit.ly/kent-c-dodds"}
                 mr={1}
               />
             }

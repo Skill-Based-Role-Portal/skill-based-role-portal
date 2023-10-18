@@ -1,6 +1,7 @@
 // General imports
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import RoleService from "../../../services/role.service";
+import StaffService from "../../../services/staff.service";
 
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
@@ -49,8 +50,24 @@ export default function CreateModal({ refresh }) {
   const scrollBehavior = "inside";
 
   const [isLoading, setIsLoading] = useState(false);
+  const [managerOptions, setManagerOptions] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const toast = useToast();
+
+  useEffect(() => {
+    fetchManagers();
+  }, []);
+
+  const fetchManagers = () => {
+    StaffService.getManagers().then(
+      (response) => {
+        setManagerOptions(response.data.data.staffs);
+      },
+      (error) => {
+        setManagerOptions([]);
+      }
+    );
+  };
 
   const today = new Date();
   const currentDate = new Date(
@@ -421,7 +438,7 @@ export default function CreateModal({ refresh }) {
                         </FormControl>
                       )}
                     </Field>
-                    <HStack w={"full"} spacing={2}>
+                    <HStack flexWrap="wrap" w={"full"} spacing={2}>
                       {selectedSkills.map((skill) => (
                         <Tag
                           key={skill}
@@ -455,7 +472,11 @@ export default function CreateModal({ refresh }) {
                             variant="filled"
                             {...field}
                           >
-                            <option>Tony Stark</option>
+                            {managerOptions.map((manager) => (
+                              <option key={manager} value={manager}>
+                                {manager}
+                              </option>
+                            ))}
                           </Select>
                           <FormErrorMessage name="hiring_manager">
                             {errors.hiring_manager}

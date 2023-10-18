@@ -10,7 +10,7 @@ import Login from "./views/Auth/Login";
 function App() {
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  const isHumanResource = currentUser?.access_rights === "Human Resource";
+  const isHumanResource = currentUser?.access_rights === "HR" || currentUser?.access_rights === "Admin";
 
   const router = createBrowserRouter([
     {

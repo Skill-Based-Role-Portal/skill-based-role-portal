@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_bcrypt import Bcrypt
 from os import environ
 
 from datetime import datetime
@@ -16,8 +15,6 @@ db = SQLAlchemy(app)
 
 CORS(app)
 
-bcrypt = Bcrypt(app)
-
 
 class Staff(db.Model):
     __tablename__ = "staffs"
@@ -28,7 +25,7 @@ class Staff(db.Model):
     department = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(60), nullable=False)
+    password = db.Column(db.String(60), nullable=False, default="password")
 
     # Add a foreign key relationship to the Access table
     access_rights_id = db.Column(db.Integer, db.ForeignKey("access.access_id"))
@@ -49,7 +46,7 @@ class Staff(db.Model):
         self.department = department
         self.location = location
         self.email = email
-        self.password = bcrypt.generate_password_hash(password).decode("utf8")
+        self.password = password
 
         # Check if the provided access_rights exists in the Access table
         access = Access.query.filter_by(access_id=access_rights).first()
@@ -96,8 +93,8 @@ class Access(db.Model):
 class Staff_Skill(db.Model):
     __tablename__ = "staff_skills"
 
-    staff_id = db.Column(db.String(20), primary_key=True)
-    skill_name = db.Column(db.String(20), primary_key=True)
+    staff_id = db.Column(db.String(50), primary_key=True)
+    skill_name = db.Column(db.String(50), primary_key=True)
 
     def __init__(self, staff_id, skill_name):
         self.staff_id = staff_id
@@ -107,35 +104,6 @@ class Staff_Skill(db.Model):
         return {"staff_id": self.staff_id, "skill_name": self.skill_name}
 
 
-with app.app_context():
-    db.create_all()
-
-    # Populate Access Rights
-    existing_access_1 = db.session.query(
-        Access).filter(Access.access_id == 1).first()
-    if not existing_access_1:
-        new_access_1 = Access(access_type="Human Resource")
-        new_access_2 = Access(access_type="Staff")
-        new_access_3 = Access(access_type="Manager")
-
-        db.session.add_all([new_access_1, new_access_2, new_access_3])
-
-        db.session.commit()
-
-    # Populate Staff
-    existing_staff_1 = db.session.query(
-        Staff).filter(Staff.staff_id == 1).first()
-    if not existing_staff_1:
-        new_staff_1 = Staff(first_name="Peter", last_name="Parker", department="Finance", location="Singapore",
-                            email="peter.parker@aio.com", password="password", access_rights=1, is_active=1)
-        new_staff_2 = Staff(first_name="Nick", last_name="Fury", department="Human Resources",
-                            location="Singapore", email="nick.fury@aio.com", password="password", access_rights=2, is_active=1)
-        new_staff_3 = Staff(first_name="Tony", last_name="Stark", department="Information Technology",
-                            location="Singapore", email="tony.stark@aio.com", password="password", access_rights=3, is_active=1)
-
-        db.session.add_all([new_staff_1, new_staff_2, new_staff_3])
-
-        db.session.commit()
 
 
 @app.route("/staff")
@@ -154,6 +122,27 @@ def get_all():
         {
             "code": 404,
             "message": "There are no staffs."
+        }
+    ), 404
+
+
+@app.route("/staff/managers")
+def get_all_manager():
+    stafflist = Staff.query.filter_by(access_rights_id=3).all()
+
+    if len(stafflist):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "staffs": [f"{staff.first_name} {staff.last_name}" for staff in stafflist]
+                }
+            }
+        ), 200
+    return jsonify(
+        {
+            "code": 404,
+            "message": "There are no managers."
         }
     ), 404
 
@@ -206,7 +195,7 @@ def login():
     staff = Staff.query.filter_by(email=email).first()
 
     if staff:
-        if bcrypt.check_password_hash(staff.password, password):
+        if staff.password == password:
             return jsonify(
                 {
                     "code": 200,
