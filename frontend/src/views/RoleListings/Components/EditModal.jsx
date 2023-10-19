@@ -1,6 +1,7 @@
 // General imports
 import { useState, useEffect, useRef } from "react";
 import RoleService from "../../../services/role.service";
+import SkillService from "../../../services/skill.service";
 import StaffService from "../../../services/staff.service";
 
 import { Formik, Field, Form } from "formik";
@@ -68,13 +69,26 @@ export default function EditModal({
   const scrollBehavior = "inside";
 
   const [isLoading, setIsLoading] = useState(false);
+  const [skillOptions, setSkillOptions] = useState([]);
   const [managerOptions, setManagerOptions] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState(skills);
   const toast = useToast();
 
   useEffect(() => {
+    fetchSkillNames();
     fetchManagers();
   }, []);
+
+  const fetchSkillNames = () => {
+    SkillService.getSkillNames().then(
+      (response) => {
+        setSkillOptions(response.data.data.skill_names);
+      },
+      (error) => {
+        setSkillOptions([]);
+      }
+    );
+  };
 
   const fetchManagers = () => {
     StaffService.getManagers().then(
@@ -445,9 +459,11 @@ export default function EditModal({
                             }
                             value={field.value}
                           >
-                            <option value={"HTML"}>HTML</option>
-                            <option value={"CSS"}>CSS</option>
-                            <option value={"JavaScript"}>JavaScript</option>
+                            {skillOptions.map((skill) => (
+                              <option key={skill} value={skill}>
+                                {skill}
+                              </option>
+                            ))}
                           </Select>
                           <FormErrorMessage name="skills">
                             {errors.skills}

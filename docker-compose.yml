@@ -153,3 +153,23 @@ services:
     environment:
       PYTHONUNBUFFERED: 1
       dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/role
+
+  #################################
+  # Skill: The Skill microservice
+  #################################
+  skill:
+    image: sbrp/skill:1.0
+    build:
+      context: .
+      dockerfile: backend/skill/Dockerfile
+    depends_on:
+      - mysql-database
+    restart: always
+    networks:
+      - internal
+      - kong-net
+    ports:
+      - "5004:5004"
+    environment:
+      PYTHONUNBUFFERED: 1
+      dbURL: mysql+mysqlconnector://root:root@host.docker.internal:3306/skill
