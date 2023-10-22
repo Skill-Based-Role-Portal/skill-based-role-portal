@@ -102,6 +102,7 @@ export default function RoleListings() {
     {
       Header: "ACTIONS",
       disableSortBy: true,
+      accessor: "skills",
       Cell: ({ row }) => (
         <Flex>
           <HStack spacing={2}>
