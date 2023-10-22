@@ -111,3 +111,29 @@ IGNORE 1 LINES
 
 CREATE DATABASE IF NOT EXISTS `application` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `application`;
+
+
+
+
+
+
+
+
+
+
+CREATE DATABASE IF NOT EXISTS skill DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE skill;
+
+CREATE TABLE IF NOT EXISTS skills (
+    skill_name VARCHAR(50),
+    description VARCHAR(256),
+    PRIMARY KEY (skill_name)
+);
+
+LOAD DATA INFILE '/data/skill.csv'
+INTO TABLE skills
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(skill_name, description);

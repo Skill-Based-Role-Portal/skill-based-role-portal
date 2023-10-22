@@ -17,6 +17,7 @@ import {
 
 // Custom components
 import SearchBar from "../../components/SearchBar";
+import FilterBar from "../../components/FilterBar";
 import SortBar from "../../components/SortBar";
 import RoleListing from "../../components/RoleListing";
 import PreviewRoleListing from "../../components/PreviewRoleListing";
@@ -34,6 +35,7 @@ export default function Main() {
   const [roles, setRoles] = useState([]);
   const [searchedRoles, setSearchedRoles] = useState([]);
   const [filteredRoles, setFilteredRoles] = useState([]);
+  const [resultRoles, setResultRoles] = useState([]);
   const [previewRole, setPreviewRole] = useState({});
   const [sortOption, setSortOption] = useState("Default");
   const [searchTimeout, setSearchTimeout] = useState(null);
@@ -66,7 +68,7 @@ export default function Main() {
     }
 
     const newTimeout = setTimeout(() => {
-      const newSearchedRoles = roles.filter((role) =>
+      const newSearchedRoles = filteredRoles.filter((role) =>
         Object.values(role).some((field) =>
           String(field).toLowerCase().includes(value.toLowerCase())
         )
@@ -75,7 +77,7 @@ export default function Main() {
       const combinedResults = applySort(newSearchedRoles, sortOption);
 
       setSearchedRoles(newSearchedRoles);
-      setFilteredRoles(combinedResults);
+      setResultRoles(combinedResults);
       fetchRoleById(combinedResults[0]?.role_id);
 
       setIsLoading(false);
@@ -92,7 +94,7 @@ export default function Main() {
     const sortedRoles = applySort(searchedRoles, value);
 
     setSortOption(value);
-    setFilteredRoles(sortedRoles);
+    setResultRoles(sortedRoles);
     fetchRoleById(sortedRoles[0]?.role_id);
 
     setTimeout(() => {
@@ -133,6 +135,62 @@ export default function Main() {
     }
   };
 
+  const handleFilterChange = (
+    locations,
+    departments,
+    employmentTypes,
+    experiences,
+    skills,
+    deadlineFrom,
+    deadlineTo
+  ) => {
+    setIsLoading(true);
+    setIsPreviewLoading(true);
+
+    const filteredRoles = roles.filter((role) => {
+      const deadlineDate = role.deadline && new Date(role.deadline);
+      const formattedDeadlineFrom = deadlineFrom && new Date(deadlineFrom);
+      const formattedDeadlineTo = deadlineTo && new Date(deadlineTo);
+
+      const locationMatch =
+        locations.length === 0 || locations.includes(role.location);
+      const departmentMatch =
+        departments.length === 0 || departments.includes(role.department);
+      const employmentTypeMatch =
+        employmentTypes.length === 0 ||
+        employmentTypes.includes(role.employment_type);
+      const experienceMatch =
+        experiences.length === 0 || experiences.includes(role.experience);
+      const skillsMatch =
+        skills.length === 0 ||
+        skills.every((skill) => role.skills.includes(skill));
+      const deadlineMatch =
+        (!formattedDeadlineFrom || deadlineDate >= formattedDeadlineFrom) &&
+        (!formattedDeadlineTo || deadlineDate <= formattedDeadlineTo);
+
+      return (
+        locationMatch &&
+        departmentMatch &&
+        employmentTypeMatch &&
+        experienceMatch &&
+        skillsMatch &&
+        deadlineMatch
+      );
+    });
+
+    const sortedRoles = applySort(filteredRoles, sortOption);
+
+    setSearchedRoles(sortedRoles);
+    setFilteredRoles(sortedRoles);
+    setResultRoles(sortedRoles);
+    fetchRoleById(sortedRoles[0]?.role_id);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsPreviewLoading(false);
+    }, 600);
+  };
+
   const fetchActiveRoles = () => {
     RoleService.getActiveRoles()
       .then(
@@ -141,6 +199,7 @@ export default function Main() {
           setRoles(rolesData);
           setSearchedRoles(rolesData);
           setFilteredRoles(rolesData);
+          setResultRoles(rolesData);
           fetchRoleById(rolesData[0]?.role_id);
         },
         (error) => {
@@ -206,11 +265,17 @@ export default function Main() {
     <Flex px={5} py={6} flexDirection={"column"} h={"full"}>
       <Flex mb={3}>
         <Grid templateColumns="repeat(12, 1fr)" gap={3} w={"full"}>
-          <GridItem colSpan={"11"}>
+          <GridItem colSpan={"10"}>
             <SearchBar onSearchChange={handleSearchChange} />
           </GridItem>
           <GridItem colSpan={"auto"}>
             <SortBar onSortChange={handleSortChange} />
+          </GridItem>
+          <GridItem colSpan={"auto"}>
+            <FilterBar
+              maxHeight={calculatedMaxHeight}
+              onApplyFilter={handleFilterChange}
+            />
           </GridItem>
         </Grid>
       </Flex>
@@ -227,7 +292,7 @@ export default function Main() {
           {isLoading ? (
             <Skeleton h={"22px"} w={"180px"} />
           ) : (
-            `Available Roles (${filteredRoles.length})`
+            `Available Roles (${resultRoles.length})`
           )}
         </Heading>
 
@@ -246,12 +311,12 @@ export default function Main() {
             >
               {isLoading ? (
                 skeletons
-              ) : filteredRoles.length === 0 ? (
+              ) : resultRoles.length === 0 ? (
                 <Tag colorScheme={"facebook"} py={2} px={3}>
                   No Roles found...
                 </Tag>
               ) : (
-                filteredRoles.map((role) => (
+                resultRoles.map((role) => (
                   <RoleListing
                     key={role.role_id}
                     role={role}
@@ -265,13 +330,14 @@ export default function Main() {
           <GridItem colSpan={{ base: 8 }}>
             {isLoading || isPreviewLoading ? (
               <PreviewRoleListingSkeleton />
-            ) : filteredRoles.length === 0 ? (
+            ) : resultRoles.length === 0 ? (
               <></>
             ) : (
               <PreviewRoleListing
                 previewRole={previewRole}
                 roleApplicationIds={roleApplicationIds}
                 staffId={currentUser?.staff_id}
+                staffSkills={currentUser?.skills}
                 refresh={refreshData}
               />
             )}
