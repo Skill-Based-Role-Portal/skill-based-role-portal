@@ -12,7 +12,7 @@ import {
 // Icons
 import { BiSearch, BiX } from "react-icons/bi";
 
-export default function SearchBar({ onSearchChange }) {
+export default function SearchBar({ onSearchChange, resetSearchChange }) {
   const [value, setValue] = useState("");
 
   const handleChange = (event) => {
