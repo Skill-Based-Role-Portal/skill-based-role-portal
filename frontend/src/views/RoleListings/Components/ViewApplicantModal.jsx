@@ -15,6 +15,7 @@ import {
   Tag,
   HStack,
   TagLabel,
+  TagLeftIcon,
   Text,
   Button,
   IconButton,
@@ -28,11 +29,19 @@ import {
 } from "@chakra-ui/react";
 
 // Icons
-import { BiX } from "react-icons/bi";
+import { BiCheckCircle, BiX, BiXCircle } from "react-icons/bi";
 
 export default function ViewApplicantModal(props) {
-  const { staffId, firstName, lastName, location, department, email, skills } =
-    props;
+  const {
+    staffId,
+    firstName,
+    lastName,
+    location,
+    department,
+    email,
+    skills,
+    roleSkills,
+  } = props;
 
   const modalSize = "6xl";
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -170,24 +179,127 @@ export default function ViewApplicantModal(props) {
               </FormControl>
 
               <FormControl>
-                <FormLabel fontSize={"sm"}>Skills</FormLabel>
-                <HStack w={"full"} spacing={2}>
-                  {skills.sort().map((skill) => (
-                    <Tag
-                      key={skill}
-                      size="md"
-                      fontSize={"xs"}
-                      variant="subtle"
-                      colorScheme="gray"
-                      color={"gray.500"}
-                      py={1}
-                      px={2}
-                    >
-                      <TagLabel _dark={{ color: "gray.500" }}>{skill}</TagLabel>
-                    </Tag>
-                  ))}
+                <FormLabel fontSize={"sm"}>
+                  <Flex alignItems={"center"}>
+                    <Text me={1}>Applicant Skills</Text>
+                    {roleSkills && roleSkills.length !== 0 ? (
+                      <Text fontSize={"xs"} fontWeight={"semibold"}>
+                        {`(${
+                          roleSkills.filter((skill) => skills?.includes(skill))
+                            .length
+                        } of ${roleSkills.length} match)`}
+                      </Text>
+                    ) : (
+                      <></>
+                    )}
+                  </Flex>
+                </FormLabel>
+                <HStack flexWrap="wrap" w={"full"} spacing={2}>
+                  {skills && skills.length !== 0 ? (
+                    skills.sort().map((skill) => (
+                      <Tag
+                        key={skill}
+                        size="md"
+                        fontSize={"xs"}
+                        variant="subtle"
+                        colorScheme="gray"
+                        backgroundColor={"gray.100"}
+                        color={"gray.600"}
+                        _dark={{
+                          color: "gray.400",
+                          backgroundColor: "gray.700",
+                        }}
+                        py={1.5}
+                        px={2.5}
+                      >
+                        {roleSkills?.includes(skill) ? (
+                          <TagLeftIcon
+                            as={BiCheckCircle}
+                            fontSize={"sm"}
+                            color={"green.400"}
+                            me={1.5}
+                          />
+                        ) : (
+                          <></>
+                        )}
+                        <TagLabel _dark={{ color: "gray.500" }}>
+                          {skill}
+                        </TagLabel>
+                      </Tag>
+                    ))
+                  ) : (
+                    <Text fontSize={"sm"} fontWeight={"regular"}>
+                      No Skills
+                    </Text>
+                  )}
                 </HStack>
               </FormControl>
+
+              {roleSkills &&
+                roleSkills.length !== 0 &&
+                roleSkills.filter((skill) => !skills?.includes(skill))
+                  .length && (
+                  <FormControl>
+                    <FormLabel fontSize={"sm"}>
+                      <Flex alignItems={"center"}>
+                        <Text me={1}>Applicant Skills Missing</Text>
+                        {roleSkills && roleSkills.length !== 0 ? (
+                          <Text fontSize={"xs"} fontWeight={"semibold"}>
+                            {`(${
+                              roleSkills.filter(
+                                (skill) => !skills?.includes(skill)
+                              ).length
+                            } of ${roleSkills.length} missing)`}
+                          </Text>
+                        ) : (
+                          <></>
+                        )}
+                      </Flex>
+                    </FormLabel>
+                    <HStack flexWrap="wrap" w={"full"} spacing={2}>
+                      {roleSkills && roleSkills.length !== 0 ? (
+                        roleSkills
+                          ?.filter((skill) => !skills?.includes(skill))
+                          .sort()
+                          .map((skill) => (
+                            <Tag
+                              key={skill}
+                              size="md"
+                              fontSize={"xs"}
+                              variant="subtle"
+                              colorScheme="gray"
+                              backgroundColor={"gray.100"}
+                              color={"gray.600"}
+                              _dark={{
+                                color: "gray.400",
+                                backgroundColor: "gray.700",
+                              }}
+                              py={1.5}
+                              px={2.5}
+                            >
+                              {roleSkills?.includes(skill) ? (
+                                <TagLeftIcon
+                                  as={BiXCircle}
+                                  fontSize={"sm"}
+                                  color={"red.400"}
+                                  me={1.5}
+                                />
+                              ) : (
+                                <></>
+                              )}
+                              <TagLabel _dark={{ color: "gray.500" }}>
+                                {skill}
+                              </TagLabel>
+                            </Tag>
+                          ))
+                      ) : (
+                        <Text fontSize={"sm"} fontWeight={"regular"}>
+                          No Skills
+                        </Text>
+                      )}
+                    </HStack>
+                  </FormControl>
+                )}
             </VStack>
           </ModalBody>
 

@@ -123,6 +123,7 @@ export default function RoleListing() {
     {
       Header: "ACTIONS",
       disableSortBy: true,
+      accessor: "skills",
       Cell: ({ row }) => (
         <Flex>
           <HStack spacing={2}>
@@ -134,6 +135,7 @@ export default function RoleListing() {
               department={row.original.department}
               email={row.original.email}
               skills={row.original.skills}
+              roleSkills={role.skills}
             />
 
             <Button
@@ -294,7 +296,7 @@ export default function RoleListing() {
                       </Flex>
                     </Flex>
                   </Flex>
-                  <Flex>
+                  <Flex mb={10}>
                     <VStack spacing={6} alignItems={"start"}>
                       <Flex flexDirection="column">
                         <Heading fontSize={"sm"} fontWeight={"semibold"} mb={2}>
@@ -328,7 +330,7 @@ export default function RoleListing() {
                         >
                           Skills
                         </Heading>
-                        <HStack spacing={2.5}>
+                        <HStack flexWrap="wrap" w={"full"} spacing={2.5}>
                           {role.skills && role.skills.length !== 0 ? (
                             role.skills.map((skill) => (
                               <Tag
