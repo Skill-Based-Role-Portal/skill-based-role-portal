@@ -32,9 +32,11 @@ import SimpleDate from "../helper/SimpleDate";
 import {
   BiBookmark,
   BiBriefcase,
+  BiCheckCircle,
   BiMap,
   BiTimeFive,
   BiX,
+  BiXCircle,
 } from "react-icons/bi";
 
 export default function PreviewRoleListing(props) {
@@ -48,6 +50,7 @@ export default function PreviewRoleListing(props) {
     modalSize,
     staffId,
     applicationStatus,
+    staffSkills,
     refresh,
   } = props;
 
@@ -240,10 +243,23 @@ export default function PreviewRoleListing(props) {
               </Text>
             </Flex>
             <Flex flexDirection="column">
-              <Heading fontSize={"md"} fontWeight={"semibold"} mb={2.5}>
-                Skills
-              </Heading>
-              <HStack spacing={2.5}>
+              <Flex alignItems={"center"} mb={2.5}>
+                <Heading fontSize={"md"} fontWeight={"semibold"} me={1.5}>
+                  Skills
+                </Heading>
+                {previewRole.skills && previewRole.skills.length !== 0 ? (
+                  <Text fontSize={"sm"} fontWeight={"semibold"}>
+                    {`(${
+                      previewRole.skills.filter((skill) =>
+                        staffSkills?.includes(skill)
+                      ).length
+                    } of ${previewRole.skills.length} match)`}
+                  </Text>
+                ) : (
+                  <></>
+                )}
+              </Flex>
+              <HStack flexWrap="wrap" w={"full"} spacing={2.5}>
                 {previewRole.skills && previewRole.skills.length !== 0 ? (
                   previewRole.skills.map((skill) => (
                     <Tag
@@ -260,6 +276,21 @@ export default function PreviewRoleListing(props) {
                         backgroundColor: "gray.700",
                       }}
                     >
+                      {staffSkills?.includes(skill) ? (
+                        <TagLeftIcon
+                          as={BiCheckCircle}
+                          fontSize={"md"}
+                          color={"green.400"}
+                          me={1.5}
+                        />
+                      ) : (
+                        <TagLeftIcon
+                          as={BiXCircle}
+                          fontSize={"md"}
+                          color={"red.400"}
+                          me={1.5}
+                        />
+                      )}
                       <TagLabel fontWeight={"semibold"}>{skill}</TagLabel>
                     </Tag>
                   ))
