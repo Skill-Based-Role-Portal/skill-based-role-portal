@@ -13,9 +13,6 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
 
-      - name: Build Kong Image
-        run: docker build -t kong-image -f backend/api_gateway/Dockerfile .
-
       - name: Build Frontend Image
         run: docker build -t frontend-image -f frontend/Dockerfile .
 
@@ -33,9 +30,6 @@ jobs:
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Push Kong Image
-        run: docker tag kong-image "${{ secrets.DOCKERHUB_USERNAME }}/kong:latest" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/kong:latest"
 
       - name: Push Frontend Image
         run: docker tag frontend-image "${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0"
