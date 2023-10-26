@@ -1,0 +1,53 @@
+name: Build Docker Images
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Kong Image
+        run: docker build -t kong-image -f backend/api_gateway/Dockerfile .
+
+      - name: Build Frontend Image
+        run: docker build -t frontend-image -f frontend/Dockerfile .
+
+      - name: Build Staff Image
+        run: docker build -t staff-image -f backend/staff/Dockerfile .
+
+      - name: Build Application Image
+        run: docker build -t application-image -f backend/application/Dockerfile .
+
+      - name: Build Role Image
+        run: docker build -t role-image -f backend/role/Dockerfile .
+
+      - name: Build Skill Image
+        run: docker build -t skill-image -f backend/skill/Dockerfile .
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Kong Image
+        run: docker tag kong-image "${{ secrets.DOCKERHUB_USERNAME }}/kong:latest" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/kong:latest"
+
+      - name: Push Frontend Image
+        run: docker tag frontend-image "${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0"
+
+      - name: Push Staff Image
+        run: docker tag staff-image "${{ secrets.DOCKERHUB_USERNAME }}/staff:1.0" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/staff:1.0"
+
+      - name: Push Application Image
+        run: docker tag application-image "${{ secrets.DOCKERHUB_USERNAME }}/application:1.0" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/application:1.0"
+
+      - name: Push Role Image
+        run: docker tag role-image "${{ secrets.DOCKERHUB_USERNAME }}/role:1.0" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/role:1.0"
+
+      - name: Push Skill Image
+        run: docker tag skill-image "${{ secrets.DOCKERHUB_USERNAME }}/skill:1.0" && docker push "${{ secrets.DOCKERHUB_USERNAME }}/skill:1.0"
