@@ -199,7 +199,7 @@ export default function DynamicTable(props) {
                 <Tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
                     <Th
-                      // {...column.getHeaderProps(column.getSortByToggleProps())}
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
                       ps={"0px"}
                     >
                       <Flex
@@ -209,7 +209,7 @@ export default function DynamicTable(props) {
                         color={"gray.400"}
                       >
                         {column.render("Header")}
-                        {/* {column.canSort ? (
+                        {column.canSort ? (
                           <Icon
                             w={{ sm: "10px", md: "12px" }}
                             h={{ sm: "10px", md: "12px" }}
@@ -223,7 +223,7 @@ export default function DynamicTable(props) {
                                 : TiArrowUnsorted
                             }
                           />
-                        ) : null} */}
+                        ) : null}
                       </Flex>
                     </Th>
                   ))}
