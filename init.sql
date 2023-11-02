@@ -120,9 +120,8 @@ USE `application`;
 
 
 
-
-CREATE DATABASE IF NOT EXISTS skill DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE skill;
+CREATE DATABASE IF NOT EXISTS `skill` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `skill`;
 
 CREATE TABLE IF NOT EXISTS skills (
     skill_name VARCHAR(50),
