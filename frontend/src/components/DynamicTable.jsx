@@ -1,5 +1,5 @@
 // General imports
-import { useMemo, forwardRef } from "react";
+import { useState, useMemo } from "react";
 
 // Chakra imports
 import {
@@ -8,6 +8,9 @@ import {
   Heading,
   Icon,
   Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -35,6 +38,7 @@ import {
 } from "react-table";
 
 // Icons
+import { BiSearch, BiX } from "react-icons/bi";
 import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 import {
   TiArrowSortedDown,
@@ -47,6 +51,8 @@ export default function DynamicTable(props) {
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+
+  const [value, setValue] = useState("");
 
   const tableInstance = useTable(
     {
@@ -86,6 +92,17 @@ export default function DynamicTable(props) {
   };
 
   const { pageIndex, pageSize, globalFilter } = state;
+
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    setValue(newValue);
+    setGlobalFilter(newValue);
+  };
+
+  const resetSearch = () => {
+    setValue("");
+    setGlobalFilter("");
+  };
 
   return (
     <Card
@@ -138,17 +155,38 @@ export default function DynamicTable(props) {
                 entries per page
               </Text>
             </Stack>
-            {/* <Input
-              type={"text"}
-              placeholder={"Search..."}
-              minW={"75px"}
-              maxW={"175px"}
-              fontSize={"xs"}
-              focusBorderColor={"pink.300"}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              size={"sm"}
-              borderRadius={"md"}
-            /> */}
+            <Flex>
+              <InputGroup
+                alignItems={"center"}
+                justifyContent={"center"}
+                size={"sm"}
+              >
+                <InputLeftElement pointerEvents="none" color="gray.500">
+                  <BiSearch />
+                </InputLeftElement>
+                <Input
+                  type={"text"}
+                  placeholder={"Search..."}
+                  minW={"100px"}
+                  maxW={"200px"}
+                  fontSize={"xs"}
+                  focusBorderColor={"pink.300"}
+                  value={value}
+                  onChange={handleChange}
+                  borderRadius={"md"}
+                />
+                {value && (
+                  <InputRightElement
+                    color="gray.500"
+                    fontSize={"lg"}
+                    onClick={resetSearch}
+                    cursor={"pointer"}
+                  >
+                    <BiX />
+                  </InputRightElement>
+                )}
+              </InputGroup>
+            </Flex>
           </Flex>
           <Table
             {...getTableProps()}
@@ -278,6 +316,14 @@ export default function DynamicTable(props) {
                         bg: "teal.500",
                         opacity: "0.6",
                         color: "#fff",
+                      }}
+                      _dark={{
+                        bg:
+                          pageNumber === pageIndex + 1
+                            ? "teal.500"
+                            : "gray.700",
+                        color:
+                          pageNumber === pageIndex + 1 ? "#fff" : "gray.200",
                       }}
                     >
                       <Text fontSize={"2xs"}>{pageNumber}</Text>

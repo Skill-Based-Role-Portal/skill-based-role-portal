@@ -54,7 +54,8 @@ export default function Sidebar() {
             <NavbarLink name={"Home"} route={""} icon={BiHomeAlt} />
           </NavbarGroup>
 
-          {(currentUser?.access_rights === "HR" || currentUser?.access_rights == "Admin") && (
+          {(currentUser?.access_rights === "HR" ||
+            currentUser?.access_rights === "Admin") && (
             <NavbarGroup groupName={"Role Listing"}>
               <NavbarLink
                 name={"Role Listings"}
