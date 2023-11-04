@@ -1,0 +1,52 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: staff
+    url: http://staff:5001/staff
+    routes:
+      - name: staff_route
+        paths:
+          - /staff
+
+  - name: application
+    url: http://application:5002/application
+    routes:
+      - name: application_route
+        paths:
+          - /application
+
+  - name: role
+    url: http://role:5003/role
+    routes:
+      - name: role_route
+        paths:
+          - /role
+
+  - name: skill
+    url: http://skill:5004/skill
+    routes:
+      - name: skill_route
+        paths:
+          - /skill
+
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - HEAD
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Access-Control-Allow-Origin
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
