@@ -31,7 +31,7 @@ jobs:
         # Wait for MySQL to start
         sleep 10
         # Create and populate the database from init.sql
-        mysql -h 127.0.0.1 -P 3306 -u root -p root < init.sql
+        mysql -h 127.0.0.1 -P 3306 -u root -proot < init.sql
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
