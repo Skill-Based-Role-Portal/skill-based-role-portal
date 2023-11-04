@@ -32,12 +32,20 @@ jobs:
     - name: Run application unit tests
       run: |
         python backend/application/unit_tests.py
+      env:
+          PYTHONPATH: ${{ github.workspace }}/backend/common
     - name: Run application integration tests
       run: |
         python backend/application/integration_tests.py
+      env:
+          PYTHONPATH: ${{ github.workspace }}/backend/common
     - name: Run role unit tests
       run: |
         python backend/role/unit_tests.py
+      env:
+          PYTHONPATH: ${{ github.workspace }}/backend/common
     - name: Run role integration tests
       run: |
-        python backend/role/integration_tests.py   
+        python backend/role/integration_tests.py
+      env:
+          PYTHONPATH: ${{ github.workspace }}/backend/common
