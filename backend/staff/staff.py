@@ -110,7 +110,7 @@ class Access(db.Model):
 class Staff_Skill(db.Model):
     __tablename__ = "staff_skills"
 
-    staff_id = db.Column(db.String(50), primary_key=True)
+    staff_id = db.Column(db.Integer, primary_key=True)
     skill_name = db.Column(db.String(50), primary_key=True)
 
     def __init__(self, staff_id, skill_name):

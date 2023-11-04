@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS staffs (
 );
 
 CREATE TABLE IF NOT EXISTS staff_skills (
-    staff_id VARCHAR(50),
+    staff_id INTEGER,
     skill_name VARCHAR(50),
     PRIMARY KEY (staff_id, skill_name),
     FOREIGN KEY (staff_id) REFERENCES staffs (staff_id)
