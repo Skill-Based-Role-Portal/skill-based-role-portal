@@ -30,12 +30,30 @@ class Role(db.Model):
     hiring_manager = db.Column(db.String(256), nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    modified = db.Column(db.DateTime, nullable=False,
-                         default=datetime.now, onupdate=datetime.now)
+    modified = db.Column(
+        db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now
+    )
 
-    role_skills = db.relationship("Role_Skill", primaryjoin="Role.name == foreign(Role_Skill.role_name)", foreign_keys="[Role_Skill.role_name]", backref="role")
+    role_skills = db.relationship(
+        "Role_Skill",
+        primaryjoin="Role.name == foreign(Role_Skill.role_name)",
+        foreign_keys="[Role_Skill.role_name]",
+        backref="role",
+    )
 
-    def __init__(self, name, experience, location, department, employment_type, requirement, description, hiring_manager, deadline, skills):
+    def __init__(
+        self,
+        name,
+        experience,
+        location,
+        department,
+        employment_type,
+        requirement,
+        description,
+        hiring_manager,
+        deadline,
+        skills,
+    ):
         self.name = name
         self.experience = experience
         self.location = location
@@ -44,7 +62,7 @@ class Role(db.Model):
         self.requirement = requirement
         self.description = description
         self.hiring_manager = hiring_manager
-        self.deadline = deadline
+        self.deadline = datetime.strptime(deadline, "%Y-%m-%d %H:%M:%S")
 
         for skill_name in skills:
             role_skill = Role_Skill(role_name=name, skill_name=skill_name)
@@ -62,9 +80,9 @@ class Role(db.Model):
             "description": self.description,
             "hiring_manager": self.hiring_manager,
             "deadline": self.deadline,
-            "status": "Active" if self.deadline.date() >= datetime.today().date() else "Expired",
+            "status": "Active" if self.deadline >= datetime.today() else "Expired",
             "created": self.created,
-            "modified": self.modified
+            "modified": self.modified,
         }
 
         r["skills"] = []
@@ -77,8 +95,8 @@ class Role(db.Model):
 class Role_Skill(db.Model):
     __tablename__ = "role_skills"
 
-    role_name = db.Column(db.String(20), primary_key=True)
-    skill_name = db.Column(db.String(20), primary_key=True)
+    role_name = db.Column(db.String(50), primary_key=True)
+    skill_name = db.Column(db.String(50), primary_key=True)
 
     def __init__(self, role_name, skill_name):
         self.role_name = role_name
@@ -92,20 +110,13 @@ class Role_Skill(db.Model):
 def get_all():
     rolelist = Role.query.all()
     if len(rolelist):
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "roles": [role.json() for role in rolelist]
-                }
-            }
-        ), 200
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no roles."
-        }
-    ), 404
+        return (
+            jsonify(
+                {"code": 200, "data": {"roles": [role.json() for role in rolelist]}}
+            ),
+            200,
+        )
+    return jsonify({"code": 404, "message": "There are no roles."}), 404
 
 
 @app.route("/role/active")
@@ -114,38 +125,21 @@ def get_all_active():
 
     rolelist = Role.query.filter(Role.deadline >= today).all()
     if len(rolelist):
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "roles": [role.json() for role in rolelist]
-                }
-            }
-        ), 200
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no active roles."
-        }
-    ), 404
+        return (
+            jsonify(
+                {"code": 200, "data": {"roles": [role.json() for role in rolelist]}}
+            ),
+            200,
+        )
+    return jsonify({"code": 404, "message": "There are no active roles."}), 404
 
 
 @app.route("/role/<role_id>")
 def find_by_role_id(role_id):
     role = Role.query.filter_by(role_id=role_id).first()
     if role:
-        return jsonify(
-            {
-                "code": 200,
-                "data": role.json()
-            }
-        ), 200
-    return jsonify(
-        {
-            "code": 404,
-            "message": "Role not found."
-        }
-    ), 404
+        return jsonify({"code": 200, "data": role.json()}), 200
+    return jsonify({"code": 404, "message": "Role not found."}), 404
 
 
 @app.route("/role", methods=["POST"])
@@ -153,34 +147,28 @@ def create_role():
     data = request.get_json()
     role = Role(**data)
 
-    if (Role.query.filter_by(name=role.name).first()):
-        return jsonify(
-            {
-                "code": 400,
-                "data": {
-                    "name": role.name
-                },
-                "message": "Role already exists."
-            }
-        ), 400
+    if Role.query.filter_by(name=role.name).first():
+        return (
+            jsonify(
+                {
+                    "code": 400,
+                    "data": {"name": role.name},
+                    "message": "Role already exists.",
+                }
+            ),
+            400,
+        )
 
     try:
         db.session.add(role)
         db.session.commit()
     except:
-        return jsonify(
-            {
-                "code": 500,
-                "message": "An error occurred creating the role."
-            }
-        ), 500
+        return (
+            jsonify({"code": 500, "message": "An error occurred creating the role."}),
+            500,
+        )
 
-    return jsonify(
-        {
-            "code": 201,
-            "data": role.json()
-        }
-    ), 201
+    return jsonify({"code": 201, "data": role.json()}), 201
 
 
 @app.route("/role/<role_id>", methods=["PUT"])
@@ -191,16 +179,21 @@ def update_role(role_id):
         data = request.get_json()
 
         if data["name"]:
-            if (Role.query.filter_by(name=data["name"]).filter(Role.role_id != role_id).first()):
-                return jsonify(
-                    {
-                        "code": 400,
-                        "data": {
-                            "name": data["name"]
-                        },
-                        "message": "Role already exists."
-                    }
-                ), 400
+            if (
+                Role.query.filter_by(name=data["name"])
+                .filter(Role.role_id != role_id)
+                .first()
+            ):
+                return (
+                    jsonify(
+                        {
+                            "code": 400,
+                            "data": {"name": data["name"]},
+                            "message": "Role already exists.",
+                        }
+                    ),
+                    400,
+                )
 
             for skill in role.role_skills:
                 db.session.delete(skill)
@@ -228,27 +221,19 @@ def update_role(role_id):
                 db.session.delete(skill)
 
             for skill_name in data["skills"]:
-                role_skill = Role_Skill(
-                    role_name=role.name, skill_name=skill_name)
+                role_skill = Role_Skill(role_name=role.name, skill_name=skill_name)
                 db.session.add(role_skill)
 
         db.session.commit()
-        return jsonify(
-            {
-                "code": 200,
-                "data": role.json()
-            }
-        )
+        return jsonify({"code": 200, "data": role.json()})
 
-    return jsonify(
-        {
-            "code": 404,
-            "data": {
-                "role_id": role_id
-            },
-            "message": "Role not found."
-        }
-    ), 404
+    return (
+        jsonify(
+            {"code": 404, "data": {"role_id": role_id}, "message": "Role not found."}
+        ),
+        404,
+    )
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5003, debug=True)
