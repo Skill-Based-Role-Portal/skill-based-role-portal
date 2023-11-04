@@ -4,7 +4,7 @@ USE `staff`;
 CREATE TABLE IF NOT EXISTS access (
     access_id INT AUTO_INCREMENT PRIMARY KEY,
     access_type VARCHAR(50) NOT NULL
-) ENGINE INNODB;
+);
 
 CREATE TABLE IF NOT EXISTS staffs (
     staff_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -18,14 +18,14 @@ CREATE TABLE IF NOT EXISTS staffs (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created DATETIME NOT NULL,
     FOREIGN KEY (access_rights_id) REFERENCES access (access_id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS staff_skills (
     staff_id INT,
     skill_name VARCHAR(50),
     PRIMARY KEY (staff_id, skill_name),
     FOREIGN KEY (staff_id) REFERENCES staffs (staff_id)
-)
+);
 
 
 
@@ -52,13 +52,13 @@ CREATE TABLE IF NOT EXISTS roles (
     deadline DATETIME NOT NULL,
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)
+);
 
 CREATE TABLE IF NOT EXISTS role_skills (
     role_name VARCHAR(50),
     skill_name VARCHAR(50),
     PRIMARY KEY (role_name, skill_name)
-)
+);
 
 
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS applications (
     status VARCHAR(50) NOT NULL,
     created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)
+);
 
 
 
@@ -97,4 +97,4 @@ CREATE TABLE IF NOT EXISTS skills (
     skill_name VARCHAR(50),
     description VARCHAR(256),
     PRIMARY KEY (skill_name)
-)
+);
