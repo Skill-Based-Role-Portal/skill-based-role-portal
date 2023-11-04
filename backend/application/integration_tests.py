@@ -1,7 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
 from application import app, db, Application
-from skill import app, db, Skill
 
 
 class TestApplication(unittest.TestCase):
