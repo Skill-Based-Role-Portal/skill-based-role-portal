@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
-from application import app, db, Application
-from role import app, db, Role
+from application.application import app, db, Application
+from role.role import app, db, Role
 
 
 class TestApplication(unittest.TestCase):
