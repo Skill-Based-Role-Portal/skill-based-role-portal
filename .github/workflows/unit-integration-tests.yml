@@ -75,3 +75,16 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}/backend/common
           dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/role
 
+      - name: Run skill unit tests
+      run: |
+        python backend/skill/unit_tests.py
+      env:
+          PYTHONPATH: ${{ github.workspace }}/backend/common
+          dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/skill
+    - name: Run skill integration tests
+      run: |
+        python backend/skill/integration_tests.py
+      env:
+          PYTHONPATH: ${{ github.workspace }}/backend/common
+          dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/skill
+
