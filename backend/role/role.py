@@ -6,7 +6,7 @@ from os import environ
 from datetime import datetime
 
 app = Flask(__name__)
-app.config["JSON_SORT_KEYS"] = False
+app.json.sort_keys = False
 app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("dbURL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_recycle": 299}

@@ -6,7 +6,7 @@ from os import environ
 from datetime import datetime
 
 app = Flask(__name__)
-app.config["JSON_SORT_KEYS"] = False
+app.json.sort_keys = False
 app.config["SQLALCHEMY_DATABASE_URI"] = environ.get("dbURL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_recycle": 299}
@@ -32,15 +32,32 @@ class Staff(db.Model):
 
     # Define a relationship to Access
     access_rights = db.relationship(
-        "Access", primaryjoin="Staff.access_rights_id == Access.access_id", backref="staff")
+        "Access",
+        primaryjoin="Staff.access_rights_id == Access.access_id",
+        backref="staff",
+    )
 
-    staff_skills = db.relationship("Staff_Skill", primaryjoin="Staff.staff_id == foreign(Staff_Skill.staff_id)",
-                                   foreign_keys="[Staff_Skill.staff_id]", backref="staff")
+    staff_skills = db.relationship(
+        "Staff_Skill",
+        primaryjoin="Staff.staff_id == foreign(Staff_Skill.staff_id)",
+        foreign_keys="[Staff_Skill.staff_id]",
+        backref="staff",
+    )
 
     is_active = db.Column(db.Boolean, default=False, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
-    def __init__(self, first_name, last_name, department, location, email, password, access_rights, is_active):
+    def __init__(
+        self,
+        first_name,
+        last_name,
+        department,
+        location,
+        email,
+        password,
+        access_rights,
+        is_active,
+    ):
         self.first_name = first_name
         self.last_name = last_name
         self.department = department
@@ -67,7 +84,7 @@ class Staff(db.Model):
             "email": self.email,
             "access_rights": self.access_rights.access_type,
             "is_active": self.is_active,
-            "created": self.created
+            "created": self.created,
         }
 
         r["skills"] = []
@@ -104,26 +121,17 @@ class Staff_Skill(db.Model):
         return {"staff_id": self.staff_id, "skill_name": self.skill_name}
 
 
-
-
 @app.route("/staff")
 def get_all():
     stafflist = Staff.query.all()
     if len(stafflist):
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "staffs": [staff.json() for staff in stafflist]
-                }
-            }
-        ), 200
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no staffs."
-        }
-    ), 404
+        return (
+            jsonify(
+                {"code": 200, "data": {"staffs": [staff.json() for staff in stafflist]}}
+            ),
+            200,
+        )
+    return jsonify({"code": 404, "message": "There are no staffs."}), 404
 
 
 @app.route("/staff/managers")
@@ -131,56 +139,37 @@ def get_all_manager():
     stafflist = Staff.query.filter_by(access_rights_id=3).all()
 
     if len(stafflist):
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "staffs": [f"{staff.first_name} {staff.last_name}" for staff in stafflist]
+        return (
+            jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "staffs": [
+                            f"{staff.first_name} {staff.last_name}"
+                            for staff in stafflist
+                        ]
+                    },
                 }
-            }
-        ), 200
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no managers."
-        }
-    ), 404
+            ),
+            200,
+        )
+    return jsonify({"code": 404, "message": "There are no managers."}), 404
 
 
 @app.route("/staff/<staff_id>")
 def find_by_staff_id(staff_id):
     staff = Staff.query.filter_by(staff_id=staff_id).first()
     if staff:
-        return jsonify(
-            {
-                "code": 200,
-                "data": staff.json()
-            }
-        ), 200
-    return jsonify(
-        {
-            "code": 404,
-            "message": "Staff not found."
-        }
-    ), 404
+        return jsonify({"code": 200, "data": staff.json()}), 200
+    return jsonify({"code": 404, "message": "Staff not found."}), 404
 
 
 @app.route("/staff/email/<email>")
 def find_by_email(email):
     staff = Staff.query.filter_by(email=email).first()
     if staff:
-        return jsonify(
-            {
-                "code": 200,
-                "data": staff.json()
-            }
-        ), 200
-    return jsonify(
-        {
-            "code": 404,
-            "message": "Staff not found."
-        }
-    ), 404
+        return jsonify({"code": 200, "data": staff.json()}), 200
+    return jsonify({"code": 404, "message": "Staff not found."}), 404
 
 
 @app.route("/staff/login", methods=["POST"])
@@ -196,27 +185,16 @@ def login():
 
     if staff:
         if staff.password == password:
-            return jsonify(
-                {
-                    "code": 200,
-                    "message": "Login successful",
-                    "data": staff.json()
-                }
-            ), 200
+            return (
+                jsonify(
+                    {"code": 200, "message": "Login successful", "data": staff.json()}
+                ),
+                200,
+            )
         else:
-            return jsonify(
-                {
-                    "code": 401,
-                    "message": "Invalid credentials"
-                }
-            ), 401
+            return jsonify({"code": 401, "message": "Invalid credentials"}), 401
 
-    return jsonify(
-        {
-            "code": 404,
-            "message": "Staff not found."
-        }
-    ), 404
+    return jsonify({"code": 404, "message": "Staff not found."}), 404
 
 
 if __name__ == "__main__":
