@@ -56,27 +56,22 @@ jobs:
       env:
           PYTHONPATH: ${{ github.workspace }}/backend/common
           dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/application
-    # - name: Run application integration tests
-    #   run: |
-    #     python backend/application/integration_tests.py
-    #   env:
-    #       PYTHONPATH: ${{ github.workspace }}/backend/common
-    #       dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/application
+    - name: Run application integration tests
+      run: |
+        python backend/application/integration_tests.py
+      env:
+          PYTHONPATH: ${{ github.workspace }}/backend/common
+          dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/application
     - name: Run role unit tests
       run: |
         python backend/role/unit_tests.py
       env:
           PYTHONPATH: ${{ github.workspace }}/backend/common
           dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/role
-    # - name: Run role integration tests
-    #   run: |
-    #     python backend/role/integration_tests.py
-    #   env:
-    #       PYTHONPATH: ${{ github.workspace }}/backend/common
-    #       dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/role
-    - name: Run integration tests
+    - name: Run role integration tests
       run: |
-        python backend/integration_tests.py
+        python backend/role/integration_tests.py
       env:
           PYTHONPATH: ${{ github.workspace }}/backend/common
           dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/role
+
