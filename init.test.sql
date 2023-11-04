@@ -1,3 +1,6 @@
+SET unique_checks=0;
+SET foreign_key_checks = 0;
+
 CREATE DATABASE IF NOT EXISTS `staff` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `staff`;
 
