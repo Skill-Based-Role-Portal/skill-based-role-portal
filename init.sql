@@ -112,7 +112,7 @@ IGNORE 1 LINES
 CREATE DATABASE IF NOT EXISTS `application` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `application`;
 
-CREATE TABLE IF NOT EXISTS roles (
+CREATE TABLE IF NOT EXISTS applications (
     application_id INT AUTO_INCREMENT PRIMARY KEY,
     staff_id INT NOT NULL,
     role_id INT NOT NULL,
