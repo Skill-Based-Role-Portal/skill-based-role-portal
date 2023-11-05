@@ -1,0 +1,86 @@
+name: Deploy to Amazon ECS
+
+on:
+    workflow_run:
+        workflows: ["docker-image"]
+            types:
+                completed
+
+env:
+    AWS_REGION: ap-southeast-1
+    ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPO }}
+    ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE_ARN }}
+    ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER_ARN }}
+    ECS_TASK_DEFINITION: ${{ secrets.AWS_ECS_TASK_DEFINITION_ARN }}
+    CONTAINER_NAME: "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1"
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    deploy:
+        name: Deploy
+        runs-on: ubuntu-latest
+        environment: production
+
+steps:
+    name: Checkout code
+    users: actions/checkout@v4
+
+    name: Configuration of AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-to-assume: ${{ secrets.AWS_ECS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+    run: |
+          echo "[default]
+            aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" > ~/.aws/credentials
+      
+    name: Log in to ECR
+    id: ECR-login
+    run: |
+          ${{ secrets.AWS_ECR_LOGIN }}
+
+    name: Pull and tag images from CI Pipeline
+    id: Pull and tag built images
+    run: |
+          images=("${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/staff:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/application:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/role:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/skill:1.0")
+
+          for image in "${images[@]}"; do
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}
+          
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${image} ${{ env.ECR_REPOSITORY }}/${image}
+            docker push ${{ env.ECR_REPOSITORY }}/${image}
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+    
+    name: Pull and tag images from Docker Hub
+    id: Pull and tag Docker Hub images
+    run: |
+          images=("phpmyadmin:5.2.0" "pantsel/konga" "kong:2.0.4" "mysql:5.7")
+
+          for image in "${images[@]}"; do
+            docker pull ${image}
+            docker tag ${image} ${{ env.ECR_REPOSITORY }}/${image}
+            docker push ${{ env.ECR_REPOSITORY }}/${image}
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    name: Fill in the new image ID in the Amazon ECS task definition
+    id: Task Definition
+    uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+    with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+    name: Deploy Amazon ECS task definition
+    id: Deployment of Task Definition
+    uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+    with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
