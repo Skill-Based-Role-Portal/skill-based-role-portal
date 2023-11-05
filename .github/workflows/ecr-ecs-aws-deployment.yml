@@ -41,7 +41,7 @@ jobs:
           ${{ secrets.AWS_ECR_LOGIN }}
 
       - name: Pull and tag images from CI Pipeline
-        id: Pull-and-tag-built-images
+        id: pull-and-tag-built-images
         run: |
           tag=("1.0")
           images=("frontend" "staff" "application" "role" "skill")
@@ -54,7 +54,7 @@ jobs:
           done
 
       - name: Pull and tag images from Docker Hub
-        id: Pull-and-tag-Docker-Hub-images
+        id: pull-and-tag-Docker-Hub-images
         run: |
           images=("phpmyadmin" "pantsel/konga" "kong" "mysql")
 
@@ -87,21 +87,21 @@ jobs:
           done
         
       - name: Fill in the new image ID in the Amazon ECS task definition
-        id: Task-Definition
+        id: task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
+          image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
       - name: Debug image value
         run: |
-          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Image: ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}"
 
       - name: Deploy Amazon ECS task definition
         id: Deployment-of-Task-Definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition: ${{ steps.task-definition.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
