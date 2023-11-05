@@ -61,6 +61,11 @@ jobs:
                 ;;
               "pantsel/konga")
                 tag="latest"
+                image="konga"
+                docker pull ${image}:${tag}
+                docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
+                docker push ${{ env.ECR_REPOSITORY }}:${image}
+                echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
                 ;;
               "kong")
                 tag="2.0.4"
@@ -68,19 +73,13 @@ jobs:
               "mysql")
                 tag="5.7"
                 ;;
-            esac  
-            docker pull ${image}:${tag}
-            case $image in
-              "pantsel/konga")
-                image="konga"
-                docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
-                docker push ${{ env.ECR_REPOSITORY }}:${image}
-              done
-              ;;
             esac
-            docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
-            docker push ${{ env.ECR_REPOSITORY }}:${image}
-            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+            if [ "$image" != "pantsel/konga" || "konga" ]; then
+              docker pull ${image}:${tag}
+              docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
+              docker push ${{ env.ECR_REPOSITORY }}:${image}
+              echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+            fi
           done
 
       - name: Fill in the new image ID in the Amazon ECS task definition
