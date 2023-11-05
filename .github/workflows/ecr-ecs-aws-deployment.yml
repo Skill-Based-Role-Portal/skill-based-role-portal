@@ -78,7 +78,7 @@ jobs:
                 tag="5.7"
                 ;;
             esac
-            if [ "$image" != "pantsel/konga"] && [ "$image" != "konga" ]; then
+            if [ "$image" != "pantsel/konga" ] && [ "$image" != "konga" ]; then
               docker pull ${image}:${tag}
               docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
               docker push ${{ env.ECR_REPOSITORY }}:${image}
