@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Build Docker Images"]
     types:
-        completed
+      - completed
 
 env:
   AWS_REGION: ap-southeast-1
@@ -56,7 +56,7 @@ jobs:
             docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${image} ${{ env.ECR_REPOSITORY }}/${image}
             docker push ${{ env.ECR_REPOSITORY }}/${image}
             echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-    
+
       - name: Pull and tag images from Docker Hub
         id: Pull-and-tag-Docker-Hub-images
         run: |
