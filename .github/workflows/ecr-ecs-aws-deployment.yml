@@ -39,7 +39,7 @@ jobs:
       - name: Pull and tag images from CI Pipeline
         id: Pull-and-tag-built-images
         run: |
-          images=("${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/staff:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/application:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/role:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/skill:1.0")
+          images=("frontend" "staff" "application" "role" "/skill")
 
           for image in "${images[@]}"; do
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}
