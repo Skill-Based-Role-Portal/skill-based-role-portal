@@ -36,22 +36,19 @@ jobs:
         run: |
           ${{ secrets.AWS_ECR_LOGIN }}
 
-          - name: Pull and tag images from CI Pipeline
-          id: Pull-and-tag-built-images
-          run: |
-            images=("${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/staff:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/application:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/role:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/skill:1.0")
+      - name: Pull and tag images from CI Pipeline
+        id: Pull-and-tag-built-images
+        run: |
+          images=("${{ secrets.DOCKERHUB_USERNAME }}/frontend:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/staff:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/application:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/role:1.0" "${{ secrets.DOCKERHUB_USERNAME }}/skill:1.0")
+
+          for image in "${images[@]}"; do
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}
         
-            for image in "${images[@]}"; do
-              docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}
-              docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${image} ${{ env.ECR_REPOSITORY }}/${image}
-              docker push ${{ env.ECR_REPOSITORY }}/${image}
-              echo "image=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
-            done
-          env:
-            ECR_REGISTRY: ${{ env.ECR_REGISTRY }}
-            ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-            IMAGE_TAG: ${{ env.IMAGE_TAG }}
-        
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${image} ${{ env.ECR_REPOSITORY }}/${image}
+            docker push ${{ env.ECR_REPOSITORY }}/${image}
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          done
+
       - name: Pull and tag images from Docker Hub
         id: Pull-and-tag-Docker-Hub-images
         run: |
