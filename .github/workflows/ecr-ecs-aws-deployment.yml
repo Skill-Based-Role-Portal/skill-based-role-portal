@@ -73,7 +73,10 @@ jobs:
             case $image in
               "pantsel/konga")
                 image="konga"
-                ;;
+                docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
+                docker push ${{ env.ECR_REPOSITORY }}:${image}
+              done
+              ;;
             esac
             docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
             docker push ${{ env.ECR_REPOSITORY }}:${image}
