@@ -86,6 +86,10 @@ jobs:
             fi
           done
 
+      - name: Debug image value
+        run: |
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+        
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: Task-Definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
