@@ -61,6 +61,7 @@ jobs:
                 ;;
               "pantsel/konga")
                 tag="latest"
+                image="konga"
                 ;;
               "kong")
                 tag="2.0.4"
