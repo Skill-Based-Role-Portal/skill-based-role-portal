@@ -52,7 +52,7 @@ jobs:
       - name: Pull and tag images from Docker Hub
         id: Pull-and-tag-Docker-Hub-images
         run: |
-          images=("phpmyadmin:5.2.0" "pantsel/konga" "kong:2.0.4" "mysql:5.7")
+          images=("phpmyadmin" "pantsel/konga" "kong" "mysql")
 
           for image in "${images[@]}"; do
             case $image in
