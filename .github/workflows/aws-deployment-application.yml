@@ -2,7 +2,7 @@ name: Deploy to Amazon ECS
 
 on:
   workflow_run:
-    workflows: ["docker-image"]
+    workflows: ["Build Docker Images"]
     types:
       - completed
 
