@@ -102,11 +102,13 @@ jobs:
             container_name=${container_names[i]}
             image=${images[i]}
             echo "Updating Task Definition for $container_name with image: $image"
-            aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-              with:
-                task-definition: ${{ env.ECS_TASK_DEFINITION }}
-                container-name: $container_name
-                image: $image
+            - name: Update Task Definition
+              run: |
+                aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+                  with:
+                    task-definition: ./spm-run-revision.json
+                    container-name: $container_name
+                    image: $image
           done
         # with:
         #   task-definition: ${{ env.ECS_TASK_DEFINITION }}
