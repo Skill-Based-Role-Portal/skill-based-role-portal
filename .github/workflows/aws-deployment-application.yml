@@ -45,7 +45,7 @@ jobs:
         id: pull-and-tag-built-images
         run: |
           tag=("1.0")
-          images=("application skill staff frontend role")
+          images=("application" "skill" "staff" "frontend" "role")
 
           for image in "${images[@]}"; do
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}:${tag}
