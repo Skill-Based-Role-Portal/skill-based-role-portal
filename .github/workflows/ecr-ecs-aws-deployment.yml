@@ -91,19 +91,42 @@ jobs:
           ls -al
         shell: bash
 
+      # - name: Extract container names from task definition JSON
+      #   run: |
+      #     container_names=$(jq -r '.containerDefinitions[].name' ${{ env.ECS_TASK_DEFINITION }})
+      #     echo "Container Names: $container_names"
+      #     echo "CONTAINER_NAMES=\"$container_names\"" >> $GITHUB_ENV
+      
+      # - name: Fill in the new image ID in the Amazon ECS task definition
+      #   id: task-definition
+      #   uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+      #   with:
+      #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
+      #     container-name: ${{ env.CONTAINER_NAMES }}
+      #     image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+
       - name: Extract container names from task definition JSON
         run: |
           container_names=$(jq -r '.containerDefinitions[].name' ${{ env.ECS_TASK_DEFINITION }})
-          echo "Container Names: $container_names"
-          echo "CONTAINER_NAMES=\"$container_names\"" >> $GITHUB_ENV
-      
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-definition
-        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-        with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAMES }}
-          image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+          echo "::set-output name=CONTAINER_NAMES::$container_names"
+        env:
+          ECS_TASK_DEFINITION: ${{ env.ECS_TASK_DEFINITION }}
+
+      - name: Update ECS Task Definition for Containers
+        run: |
+          IFS=$'\n' # Set the Internal Field Separator to newline
+          for container_name in $CONTAINER_NAMES; do
+            echo "Updating Task Definition for $container_name"
+            aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+              with:
+                task-definition: ${{ env.ECS_TASK_DEFINITION }}
+                container-name: $container_name
+                image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+          done
+        env:
+          ECS_TASK_DEFINITION: ${{ env.ECS_TASK_DEFINITION }}
+          CONTAINER_NAMES: ${{ steps.extract-containers.outputs.CONTAINER_NAMES }}
+
           
       - name: Debug image value
         run: |
