@@ -98,13 +98,26 @@ jobs:
           echo "Container Names: $container_names_str"
           echo "CONTAINER_NAMES=\"$container_names_str\"" >> $GITHUB_ENV
       
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-definition
-        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-        with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAMES }}
-          image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+      - name: Update Task Definitions
+        id: update-task-definitions
+        run: |
+          container_names=($CONTAINER_NAMES)
+          for container_name in "${container_names[@]}"; do
+            echo "Updating Task Definition for $container_name"
+            aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+              with:
+                task-definition: ${{ env.ECS_TASK_DEFINITION }}
+                container-name: $container_name
+                image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+          done
+      
+      # - name: Fill in the new image ID in the Amazon ECS task definition
+      #   id: task-definition
+      #   uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+      #   with:
+      #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
+      #     container-name: ${{ env.CONTAINER_NAMES }}
+      #     image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
           
       - name: Debug image value
         run: |
