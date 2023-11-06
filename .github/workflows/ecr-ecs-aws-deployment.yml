@@ -93,9 +93,10 @@ jobs:
 
       - name: Extract container names from task definition JSON
         run: |
-          container_names=$(jq -r '.containerDefinitions[].name' ${{ env.ECS_TASK_DEFINITION }})
-          echo "Container Names: $container_names"
-          echo "CONTAINER_NAMES=\"$container_names\"" >> $GITHUB_ENV
+          container_names=$(jq -r '.containerDefinitions[].name' ./spm-run-revision24.json)
+          container_names_str=$(echo $container_names | tr '\n' ' ')
+          echo "Container Names: $container_names_str"
+          echo "CONTAINER_NAMES=\"$container_names_str\"" >> $GITHUB_ENV
       
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-definition
