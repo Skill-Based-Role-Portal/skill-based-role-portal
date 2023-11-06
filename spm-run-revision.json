@@ -127,7 +127,7 @@
                 },
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/application"
+                    "value": "mysql+mysqlconnector://root:root@localhost:3306/application"
                 }
             ],
             "environmentFiles": [],
@@ -170,7 +170,7 @@
             "environment": [
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/skill"
+                    "value": "mysql+mysqlconnector://root:root@localhost:3306/skill"
                 },
                 {
                     "name": "PYTHONUNBUFFERED",
@@ -253,7 +253,7 @@
             "environment": [
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/staff"
+                    "value": "mysql+mysqlconnector://root:root@localhost:3306/staff"
                 },
                 {
                     "name": "PYTHONUNBUFFERED",
@@ -378,7 +378,7 @@
             "environment": [
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/role"
+                    "value": "mysql+mysqlconnector://root:root@localhost:3306/role"
                 },
                 {
                     "name": "PYTHONUNBUFFERED",
