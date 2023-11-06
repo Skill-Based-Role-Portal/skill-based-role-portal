@@ -113,6 +113,7 @@ jobs:
           ECS_TASK_DEFINITION: ${{ env.ECS_TASK_DEFINITION }}
 
       - name: Update ECS Task Definition for Containers
+        id: task-definition
         run: |
           IFS=$'\n' # Set the Internal Field Separator to newline
           for container_name in $CONTAINER_NAMES; do
