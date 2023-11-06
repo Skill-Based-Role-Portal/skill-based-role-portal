@@ -12,7 +12,7 @@ env:
   ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE_ARN }}
   ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER_ARN }}
   ECS_TASK_DEFINITION: ./spm-run-revision24.json
-  CONTAINER_NAME: "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1 role"
+  CONTAINER_NAME: "role"
 
 permissions:
   id-token: write
@@ -44,7 +44,7 @@ jobs:
         id: pull-and-tag-built-images
         run: |
           tag=("1.0")
-          images=("frontend" "staff" "application" "role" "skill")
+          images=("role")
 
           for image in "${images[@]}"; do
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}:${tag}
@@ -90,39 +90,14 @@ jobs:
         run: |
           ls -al
         shell: bash
-
-      # - name: Extract container names from task definition JSON
-      #   run: |
-      #     container_names=$(jq -r '.containerDefinitions[].name' ${{ env.ECS_TASK_DEFINITION }})
-      #     echo "Container Names: $container_names"
-      #     echo "CONTAINER_NAMES=\"$container_names\"" >> $GITHUB_ENV
       
-      # - name: Fill in the new image ID in the Amazon ECS task definition
-      #   id: task-definition
-      #   uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-      #   with:
-      #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
-      #     container-name: ${{ env.CONTAINER_NAMES }}
-      #     image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
-
-      - name: Extract container names from task definition JSON
-        run: |
-          container_names=$(jq -r '.containerDefinitions[].name' ${{ env.ECS_TASK_DEFINITION }})
-          echo "::set-output name=CONTAINER_NAMES::$container_names"
-        env:
-          ECS_TASK_DEFINITION: ${{ env.ECS_TASK_DEFINITION }}
-
-      - name: Update ECS Task Definition for Containers
+      - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
-        run: |
-          for container_name in $CONTAINER_NAMES; do
-            echo "Updating Task Definition for $container_name"
-            aws-actions/amazon-ecs-render-task-definition@v1
-              with:
-                task-definition: ${{ env.ECS_TASK_DEFINITION }}
-                container-name: $container_name
-                image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
-          done
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
         
       - name: Deploy Amazon ECS task definition
         id: Deployment-of-Task-Definition

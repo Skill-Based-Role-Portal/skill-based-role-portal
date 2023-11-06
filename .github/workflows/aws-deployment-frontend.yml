@@ -1,0 +1,109 @@
+name: Deploy to Amazon ECS
+
+on: [push]
+  # workflow_run:
+  #   workflows: ["Build Docker Images"]
+  #   types:
+  #     - completed
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPO }}
+  ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE_ARN }}
+  ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER_ARN }}
+  ECS_TASK_DEFINITION: ./spm-run-revision24.json
+  CONTAINER_NAME: "frontend-1"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configuration of AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to ECR
+        id: ECR-login
+        run: |
+          ${{ secrets.AWS_ECR_LOGIN }}
+
+      - name: Pull and tag images from CI Pipeline
+        id: pull-and-tag-built-images
+        run: |
+          tag=("1.0")
+          images=("frontend")
+
+          for image in "${images[@]}"; do
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}:${tag}
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
+            docker push ${{ env.ECR_REPOSITORY }}:${image}
+            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          done
+
+      - name: Pull and tag images from Docker Hub
+        id: pull-and-tag-Docker-Hub-images
+        run: |
+          images=("phpmyadmin" "pantsel/konga" "kong" "mysql")
+
+          for image in "${images[@]}"; do
+            case $image in
+              "phpmyadmin")
+                tag="5.2.0"
+                ;;
+              "pantsel/konga")
+                tag="latest"
+                docker pull ${image}:${tag}
+                kongaImage="konga"
+                docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${kongaImage}
+                docker push ${{ env.ECR_REPOSITORY }}:${kongaImage}
+                echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+                ;;
+              "kong")
+                tag="2.0.4"
+                ;;
+              "mysql")
+                tag="5.7"
+                ;;
+            esac
+            if [ "$image" != "pantsel/konga" ] && [ "$image" != "konga" ]; then
+              docker pull ${image}:${tag}
+              docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
+              docker push ${{ env.ECR_REPOSITORY }}:${image}
+              echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+            fi
+          done
+      
+      - name: Debug Directory
+        run: |
+          ls -al
+        shell: bash
+      
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+        
+      - name: Deploy Amazon ECS task definition
+        id: Deployment-of-Task-Definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
