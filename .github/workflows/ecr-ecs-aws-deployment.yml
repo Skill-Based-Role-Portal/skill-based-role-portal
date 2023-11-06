@@ -95,7 +95,7 @@ jobs:
         run: |
           container_names=$(jq -r '.containerDefinitions[].name' ${{ env.ECS_TASK_DEFINITION }})
           echo "Container Names: $container_names"
-          echo "::set-env name=CONTAINER_NAMES::$container_names"
+          echo "CONTAINER_NAMES=$container_names" >> $GITHUB_ENV
       
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-definition
