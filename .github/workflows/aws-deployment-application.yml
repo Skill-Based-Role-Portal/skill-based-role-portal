@@ -112,7 +112,6 @@ jobs:
                 container-name: $container_name
                 image: $image
           done
-
       
         # with:
         #   task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -120,11 +119,57 @@ jobs:
         #   # image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
         #   image: ${{ steps.pull-and-tag-built-images.outputs.image }}
 
-      - name: Deploy Amazon ECS task definition
-        id: Deployment-of-Task-Definition
+      - name: Render Amazon ECS task definition for app container
+        id: render-application-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: application-1
+          image: ${{env.ECR_REPOSITORY}}:application
+          environment-variables: |
+              LOG_LEVEL=info
+              ENVIRONMENT=prod
+          docker-labels: |
+              SERVICE=service
+              VERSION=version
+  
+      - name: Modify Amazon ECS task definition with skill container
+        id: render-skill-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: skill-1
+          image: ${{env.ECR_REPOSITORY}}:skill
+
+      - name: Modify Amazon ECS task definition with staff container
+        id: render-staff-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: staff-1
+          image: ${{env.ECR_REPOSITORY}}:staff
+
+      - name: Modify Amazon ECS task definition with frontend container
+        id: render-frontend-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: frontend-1
+          image: ${{env.ECR_REPOSITORY}}:frontend
+
+      - name: Modify Amazon ECS task definition with role container
+        id: render-role-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: role
+          image: ${{env.ECR_REPOSITORY}}:role
+
+
+      - name: Deploy to Amazon ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition: ${{ steps.render-role-container.outputs.task-definition }} # Takes last rendered
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
