@@ -101,10 +101,11 @@ jobs:
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-definition
         run: |
+          container_images=$(jq -n -c --argjson containers $CONTAINER_IMAGES '$containers')
           container_names=($CONTAINER_NAMES)
           for container_name in "${container_names[@]}"; do
-            echo "Updating Task Definition for $container_name"
-            image="${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}"
+            image=$(echo $container_images | jq -r ".$container_name")
+            echo "Updating Task Definition for $container_name with image: $image"
             aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
               with:
                 task-definition: ${{ env.ECS_TASK_DEFINITION }}
