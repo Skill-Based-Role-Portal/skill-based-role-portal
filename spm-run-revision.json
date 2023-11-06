@@ -1,0 +1,481 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:861728747295:task-definition/spm-run:24",
+    "containerDefinitions": [
+        {
+            "name": "mysql-database-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:mysql",
+            "cpu": 512,
+            "memory": 2048,
+            "memoryReservation": 1024,
+            "portMappings": [
+                {
+                    "name": "mysql-database-1-3306-tcp",
+                    "containerPort": 3306,
+                    "hostPort": 3306,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": false,
+            "environment": [
+                {
+                    "name": "MYSQL_DATABASE",
+                    "value": "root"
+                },
+                {
+                    "name": "MYSQL_PASSWORD",
+                    "value": "password"
+                },
+                {
+                    "name": "MYSQL_LOCAL_INFILE",
+                    "value": "\"1\""
+                },
+                {
+                    "name": "MYSQL_ROOT_PASSWORD",
+                    "value": "root"
+                },
+                {
+                    "name": "MYSQL_USER",
+                    "value": "admin"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "ulimits": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "kong-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:kong",
+            "cpu": 256,
+            "memory": 512,
+            "memoryReservation": 512,
+            "portMappings": [
+                {
+                    "name": "kong-1-8000-tcp",
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "KONG_DATABASE",
+                    "value": "off"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "application-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:application",
+            "cpu": 512,
+            "memory": 1024,
+            "memoryReservation": 512,
+            "portMappings": [
+                {
+                    "name": "application-1-5002-tcp",
+                    "containerPort": 5002,
+                    "hostPort": 5002,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "roleURL",
+                    "value": "http://role:5003/role/"
+                },
+                {
+                    "name": "staffURL",
+                    "value": "http://staff:5001/staff/"
+                },
+                {
+                    "name": "PYTHONUNBUFFERED",
+                    "value": "1"
+                },
+                {
+                    "name": "dbURL",
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/application"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "workingDirectory": "/usr/src/app",
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "skill-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:skill",
+            "cpu": 512,
+            "memory": 1024,
+            "memoryReservation": 512,
+            "portMappings": [
+                {
+                    "name": "skill-1-5004-tcp",
+                    "containerPort": 5004,
+                    "hostPort": 5004,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "dbURL",
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/skill"
+                },
+                {
+                    "name": "PYTHONUNBUFFERED",
+                    "value": "1"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "konga-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:konga",
+            "cpu": 256,
+            "memory": 512,
+            "memoryReservation": 512,
+            "portMappings": [
+                {
+                    "name": "konga-1-1337-tcp",
+                    "containerPort": 1337,
+                    "hostPort": 1337,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "staff-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:staff",
+            "cpu": 512,
+            "memory": 1024,
+            "memoryReservation": 512,
+            "portMappings": [
+                {
+                    "name": "staff-1-5001-tcp",
+                    "containerPort": 5001,
+                    "hostPort": 5001,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "dbURL",
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/staff"
+                },
+                {
+                    "name": "PYTHONUNBUFFERED",
+                    "value": "1"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "frontend-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:frontend",
+            "cpu": 512,
+            "memory": 1536,
+            "memoryReservation": 1024,
+            "portMappings": [
+                {
+                    "name": "frontend-1-5173-tcp",
+                    "containerPort": 5173,
+                    "hostPort": 5173,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "phpmyadmin-1",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:phpmyadmin",
+            "cpu": 512,
+            "memory": 1024,
+            "memoryReservation": 512,
+            "portMappings": [
+                {
+                    "name": "phpmyadmin-1-80-tcp",
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "PMA_ARBITRARY",
+                    "value": "1"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "role",
+            "image": "861728747295.dkr.ecr.ap-southeast-1.amazonaws.com/spm-repo:role",
+            "cpu": 512,
+            "memory": 1024,
+            "memoryReservation": 1024,
+            "portMappings": [
+                {
+                    "name": "role-5003-tcp",
+                    "containerPort": 5003,
+                    "hostPort": 5003,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "dbURL",
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/role"
+                },
+                {
+                    "name": "PYTHONUNBUFFERED",
+                    "value": "1"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "mysql-database-1",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/spm-run",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        }
+    ],
+    "family": "spm-run",
+    "taskRoleArn": "arn:aws:iam::861728747295:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::861728747295:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 24,
+    "volumes": [
+        {
+            "name": "kongadata",
+            "host": {}
+        },
+        {
+            "name": "mysql",
+            "host": {}
+        }
+    ],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.container-ordering"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "cpu": "4096",
+    "memory": "10240",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "registeredAt": "2023-11-05T09:34:12.665Z",
+    "registeredBy": "arn:aws:iam::861728747295:root",
+    "tags": []
+}
