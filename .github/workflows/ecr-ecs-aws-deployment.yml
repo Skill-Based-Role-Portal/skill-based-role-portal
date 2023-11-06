@@ -113,26 +113,22 @@ jobs:
           ECS_TASK_DEFINITION: ${{ env.ECS_TASK_DEFINITION }}
 
       - name: Update ECS Task Definition for Containers
-        id: task-definition
+        id: task-def
         run: |
           for container_name in $CONTAINER_NAMES; do
             echo "Updating Task Definition for $container_name"
-            aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+            aws-actions/amazon-ecs-render-task-definition@v1
               with:
                 task-definition: ${{ env.ECS_TASK_DEFINITION }}
                 container-name: $container_name
                 image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
           done
-        env:
-          ECS_TASK_DEFINITION: ${{ env.ECS_TASK_DEFINITION }}
-          CONTAINER_NAMES: ${{ steps.extract-containers.outputs.CONTAINER_NAMES }}
-          task-definition: ${{ steps.task-definition.outputs.task-definition }}
-
+        
       - name: Deploy Amazon ECS task definition
         id: Deployment-of-Task-Definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.task-definition.outputs.task-definition }}
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
