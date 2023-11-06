@@ -11,8 +11,9 @@ env:
   ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPO }}
   ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE_ARN }}
   ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER_ARN }}
-  ECS_TASK_DEFINITION: ./spm-run-revision24.json
-  CONTAINER_NAME: "application-1 skill-1 staff-1 frontend-1 role"
+  ECS_TASK_DEFINITION: ./spm-run-revision.json
+  IMAGES: "application skill staff frontend role"
+  CONTAINER_NAMES: "application-1 skill-1 staff-1 frontend-1 role"
   # "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1 role"
 
 permissions:
@@ -94,12 +95,24 @@ jobs:
       
       - name: Update ECS Task Definitions
         id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-        with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
-          # image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
-          image: ${{ steps.pull-and-tag-built-images.outputs.image }}
+        run: |
+          containers=($CONTAINER_NAMES)
+          images=($IMAGES)
+          for ((i=0; i<${#container_names[@]}; i++)); do
+            container_name=${container_names[i]}
+            image=${images[i]}
+            echo "Updating Task Definition for $container_name with image: $image"
+            aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+              with:
+                task-definition: ${{ env.ECS_TASK_DEFINITION }}
+                container-name: $container_name
+                image: $image
+          done
+        # with:
+        #   task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        #   container-name: ${{ env.CONTAINER_NAME }}
+        #   # image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+        #   image: ${{ steps.pull-and-tag-built-images.outputs.image }}
 
       - name: Deploy Amazon ECS task definition
         id: Deployment-of-Task-Definition
