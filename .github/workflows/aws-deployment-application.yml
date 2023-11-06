@@ -12,7 +12,7 @@ env:
   ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE_ARN }}
   ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER_ARN }}
   ECS_TASK_DEFINITION: ./spm-run-revision24.json
-  CONTAINER_NAME: "skill-1"
+  CONTAINER_NAME: "application -1 skill-1 staff-1 frontend-1 role"
   # "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1 role"
 
 permissions:
@@ -45,7 +45,7 @@ jobs:
         id: pull-and-tag-built-images
         run: |
           tag=("1.0")
-          images=("skill")
+          images=("application skill staff frontend role")
 
           for image in "${images[@]}"; do
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${image}:${tag}
@@ -54,54 +54,53 @@ jobs:
             echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
           done
 
-      - name: Pull and tag images from Docker Hub
-        id: pull-and-tag-Docker-Hub-images
-        run: |
-          images=("phpmyadmin" "pantsel/konga" "kong" "mysql")
+      # - name: Pull and tag images from Docker Registry
+      #   id: pull-and-tag-Docker-Hub-images
+      #   run: |
+      #     images=("phpmyadmin" "pantsel/konga" "kong" "mysql")
 
-          for image in "${images[@]}"; do
-            case $image in
-              "phpmyadmin")
-                tag="5.2.0"
-                ;;
-              "pantsel/konga")
-                tag="latest"
-                docker pull ${image}:${tag}
-                kongaImage="konga"
-                docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${kongaImage}
-                docker push ${{ env.ECR_REPOSITORY }}:${kongaImage}
-                echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-                ;;
-              "kong")
-                tag="2.0.4"
-                ;;
-              "mysql")
-                tag="5.7"
-                ;;
-            esac
-            if [ "$image" != "pantsel/konga" ] && [ "$image" != "konga" ]; then
-              docker pull ${image}:${tag}
-              docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
-              docker push ${{ env.ECR_REPOSITORY }}:${image}
-              echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-            fi
-          done
+      #     for image in "${images[@]}"; do
+      #       case $image in
+      #         "phpmyadmin")
+      #           tag="5.2.0"
+      #           ;;
+      #         "pantsel/konga")
+      #           tag="latest"
+      #           docker pull ${image}:${tag}
+      #           kongaImage="konga"
+      #           docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${kongaImage}
+      #           docker push ${{ env.ECR_REPOSITORY }}:${kongaImage}
+      #           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      #           ;;
+      #         "kong")
+      #           tag="2.0.4"
+      #           ;;
+      #         "mysql")
+      #           tag="5.7"
+      #           ;;
+      #       esac
+      #       if [ "$image" != "pantsel/konga" ] && [ "$image" != "konga" ]; then
+      #         docker pull ${image}:${tag}
+      #         docker tag ${image}:${tag} ${{ env.ECR_REPOSITORY }}:${image}
+      #         docker push ${{ env.ECR_REPOSITORY }}:${image}
+      #         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      #       fi
+      #     done
       
       - name: Debug Directory
         run: |
           ls -al
         shell: bash
       
-      - name: Fill in the new image ID in the Amazon ECS task definition
+      - name: Update ECS Task Definitions
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           # image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
-          image: skill-1
+          image: ${{ steps.pull-and-tag-built-images.outputs.image }}
 
-        
       - name: Deploy Amazon ECS task definition
         id: Deployment-of-Task-Definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
