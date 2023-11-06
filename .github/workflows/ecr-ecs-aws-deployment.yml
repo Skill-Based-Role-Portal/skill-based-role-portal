@@ -12,7 +12,7 @@ env:
   ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE_ARN }}
   ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER_ARN }}
   ECS_TASK_DEFINITION: ./spm-run-revision24.json
-  CONTAINER_NAME: "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1"
+  CONTAINER_NAME: "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1 role"
 
 permissions:
   id-token: write
