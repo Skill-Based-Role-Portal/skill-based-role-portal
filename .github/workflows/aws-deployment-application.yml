@@ -92,7 +92,11 @@ jobs:
         run: |
           ls -al
         shell: bash
-      
+
+      - name: Debug Pull and Tag Image Output
+        run: |
+          echo "Image Output: ${{ steps.pull-and-tag-built-images.outputs.image }}"
+            
       - name: Update ECS Task Definitions
         id: task-def
         run: |
