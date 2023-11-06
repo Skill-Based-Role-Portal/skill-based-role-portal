@@ -126,6 +126,7 @@ jobs:
         env:
           ECS_TASK_DEFINITION: ${{ env.ECS_TASK_DEFINITION }}
           CONTAINER_NAMES: ${{ steps.extract-containers.outputs.CONTAINER_NAMES }}
+          task-definition: ${{ steps.task-definition.outputs.task-definition }}
 
       - name: Deploy Amazon ECS task definition
         id: Deployment-of-Task-Definition
