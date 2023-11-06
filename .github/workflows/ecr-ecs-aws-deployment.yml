@@ -85,7 +85,12 @@ jobs:
               echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
             fi
           done
-        
+      
+      - name: Debug Directory
+        run: |
+          ls -al
+        shell: bash
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
