@@ -97,8 +97,7 @@ jobs:
         id: task-def
         run: |
           containers=($CONTAINER_NAMES)
-          images=($IMAGES)
-      
+          images: ${{ steps.pull-and-tag-built-images.outputs.image }}
           for ((i=0; i<${#containers[@]}; i++)); do
             container_name=${containers[i]}
             image=${images[i]}
