@@ -127,7 +127,7 @@
                 },
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@127.0.0.1:3306/application"
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/application"
                 }
             ],
             "environmentFiles": [],
@@ -170,7 +170,7 @@
             "environment": [
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@127.0.0.1:3306/skill"
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/skill"
                 },
                 {
                     "name": "PYTHONUNBUFFERED",
@@ -253,7 +253,7 @@
             "environment": [
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@127.0.0.1:3306/staff"
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/staff"
                 },
                 {
                     "name": "PYTHONUNBUFFERED",
@@ -325,9 +325,9 @@
             "memoryReservation": 512,
             "portMappings": [
                 {
-                    "name": "phpmyadmin-1-5013-tcp",
-                    "containerPort": 5013,
-                    "hostPort": 5013,
+                    "name": "phpmyadmin-1-80-tcp",
+                    "containerPort": 80,
+                    "hostPort": 80,
                     "protocol": "tcp",
                     "appProtocol": "http"
                 }
@@ -378,7 +378,7 @@
             "environment": [
                 {
                     "name": "dbURL",
-                    "value": "mysql+mysqlconnector://root:root@127.0.0.1:3306/role"
+                    "value": "mysql+mysqlconnector://root:root@host.docker.internal:3306/role"
                 },
                 {
                     "name": "PYTHONUNBUFFERED",
@@ -414,6 +414,10 @@
     "volumes": [
         {
             "name": "kongadata",
+            "host": {}
+        },
+        {
+            "name": "mysql",
             "host": {}
         }
     ],
