@@ -97,21 +97,21 @@ jobs:
         run: |
           echo "Image Output: ${{ steps.pull-and-tag-built-images.outputs.image }}"
             
-      - name: Update ECS Task Definitions
-        id: task-def
-        run: |
-          containers=($CONTAINER_NAMES)
-          images=($IMAGES)
-          for ((i=0; i<${#containers[@]}; i++)); do
-            container_name=${containers[i]}
-            image=${images[i]}
-            echo "Updating Task Definition for $container_name with image: $image"
-              uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-              with:
-                task-definition: ./spm-run-revision.json
-                container-name: $container_name
-                image: $image
-          done
+      # - name: Update ECS Task Definitions
+      #   id: task-def
+      #   run: |
+      #     containers=($CONTAINER_NAMES)
+      #     images=($IMAGES)
+      #     for ((i=0; i<${#containers[@]}; i++)); do
+      #       container_name=${containers[i]}
+      #       image=${images[i]}
+      #       echo "Updating Task Definition for $container_name with image: $image"
+      #         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+      #         with:
+      #           task-definition: ./spm-run-revision.json
+      #           container-name: $container_name
+      #           image: $image
+      #     done
       
         # with:
         #   task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -164,7 +164,6 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: role
           image: ${{env.ECR_REPOSITORY}}:role
-
 
       - name: Deploy to Amazon ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
