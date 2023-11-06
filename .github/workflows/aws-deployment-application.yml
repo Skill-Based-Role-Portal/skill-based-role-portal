@@ -1,10 +1,10 @@
 name: Deploy to Amazon ECS
 
-on: [push]
-  # workflow_run:
-  #   workflows: ["docker-image"]
-  #   types:
-  #     - completed
+on:
+  workflow_run:
+    workflows: ["docker-image"]
+    types:
+      - completed
 
 env:
   AWS_REGION: ap-southeast-1
