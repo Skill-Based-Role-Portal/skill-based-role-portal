@@ -12,7 +12,7 @@ env:
   ECS_SERVICE: ${{ secrets.AWS_ECS_SERVICE_ARN }}
   ECS_CLUSTER: ${{ secrets.AWS_ECS_CLUSTER_ARN }}
   ECS_TASK_DEFINITION: ./spm-run-revision24.json
-  CONTAINER_NAME: "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1 role"
+  # CONTAINER_NAME: "mysql-database-1 kong-1 application-1 skill-1 konga-1 staff-1 frontend-1 phpmyadmin-1 role"
 
 permissions:
   id-token: write
@@ -91,16 +91,24 @@ jobs:
           ls -al
         shell: bash
 
+      - name: Extract container names from task definition JSON
+        run: |
+          container_names=$(jq -r '.containerDefinitions[].name' ${{ env.ECS_TASK_DEFINITION }})
+          echo "Container Names: $container_names"
+          echo "::set-env name=CONTAINER_NAMES::$container_names"
+      
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
+          container-name: ${{ env.CONTAINER_NAMES }}
           image: ${{ steps.pull-and-tag-built-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}
+          
       - name: Debug image value
         run: |
           echo "Image: ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }} ${{ steps.pull-and-tag-Docker-Hub-images.outputs.image }}"
+      
 
       - name: Deploy Amazon ECS task definition
         id: Deployment-of-Task-Definition
