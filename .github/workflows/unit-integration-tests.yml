@@ -86,4 +86,3 @@ jobs:
       env:
           PYTHONPATH: ${{ github.workspace }}/backend/common
           dbURL: mysql+mysqlconnector://root:root@127.0.0.1:3306/skill
-
