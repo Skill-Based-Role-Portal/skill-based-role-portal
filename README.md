@@ -61,6 +61,11 @@ To test the API endpoints of the microservices, import the following to Postman.
 
 <hr>
 
+## Credentials to Login
+
+**Username:** jack.sim@allinone.com.sg
+**Password:** password
+
 ## Troubleshooting
 
 ### Docker-compose build fails
